@@ -21,7 +21,7 @@ CREATE TABLE `Recommendation` (
 CREATE TABLE `Connection` (
   `requester_id` int NOT NULL,
   `recipient_id` int NOT NULL,
-  `state` enum('pending','accepted','rejected'),
+  `state` enum('pending','accepted','rejected') NOT NULL,
   PRIMARY KEY (`requester_id`, `recipient_id`),
   CONSTRAINT FK_RequesterUser FOREIGN KEY (requester_id) 
   REFERENCES User(id) ON DELETE CASCADE ON UPDATE CASCADE,
@@ -35,7 +35,7 @@ CREATE TABLE `Event` (
   `location` varchar(150),
   `start_date` timestamp,
   `end_date` timestamp,
-  `state` enum('created','occurred','deleted','closed'),
+  `state` enum('created','occurred','deleted','closed') NOT NULL,
   PRIMARY KEY (`id`)
 );
 
@@ -59,24 +59,16 @@ CREATE TABLE `Verification` (
   REFERENCES User(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
-CREATE TABLE `Role` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `name` varchar(50) NOT NULL,
-  PRIMARY KEY (`id`)
-);
-
 CREATE TABLE `Membership` (
   `id` int NOT NULL AUTO_INCREMENT,
   `user_id` int NOT NULL,
   `event_id` int NOT NULL,
-  `role_id` int,
+  `role` enum('requester','member','manager','admin','rejected','fmember') NOT NULL,
   `designation` varchar(100) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE(`user_id`,`event_id`),
   CONSTRAINT FK_MembershipUser FOREIGN KEY (user_id) 
   REFERENCES User(id) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT FK_MembershipEvent FOREIGN KEY (event_id) 
-  REFERENCES Event(id) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT FK_MembershipRole FOREIGN KEY (role_id) 
-  REFERENCES Event(id) ON DELETE SET NULL ON UPDATE CASCADE
+  REFERENCES Event(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
