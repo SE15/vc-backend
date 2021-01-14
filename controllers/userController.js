@@ -1,6 +1,12 @@
+const Sequelize= require('sequelize');
 const bcrypt = require("bcrypt");
 const UserModel=require('../models/user-model');
-class User extends Model{
+const EventModel=require('../models/event-model');
+const SkillModel=require('../models/skill-model');
+const ConnectionModel=require('../models/connection-model');
+const ReccomendationModel=require('../models/recommendation-model');
+const MembershipModel=require('../models/membership-model');
+class User{
     addUser(fullname,username,password,profile_pic){
     const newUser= await UserModel.create({
         name: `${fullname}`,
@@ -48,7 +54,7 @@ class User extends Model{
     })
 }
 
-    edit(username,name="",profile_pic=""){
+    editAccount(username,name="",profile_pic=""){
     if (name.length>0 && profile_pic.length>0){
         await UserModel.update({ name: `${name}` , profile_pic:`${profile_pic}`}, {
             where: {
@@ -68,5 +74,83 @@ class User extends Model{
             }
           })
     }
-}
+    }
+
+    addEvent(name,location,start_date,end_date){
+    const newEvent= await EventModel.create({
+        name: `${name}`,
+        location: `${location}`,
+        start_date: `${start_date}`,
+        end_date: `${end_date}`,
+        state:'created'
+
+    });
+    }
+
+    getAllEvents(){
+    const events=EventModel.findAll({
+        attributes:['name','location','start_date','end_date','state']
+    });
+
+    return events;
+    }
+
+    searchEvent(name){
+
+    const event=Post.findAll({
+        where:{
+            name: `${name}`
+        }
+    });
+    return event;
+
+    }
+
+    deleteEvent(id){
+    await EventModel.destroy({
+        where:{
+            id: `${id}`
+        }
+    });
+    }
+
+
+    changeState(newState){
+    await EventModel.update({state: `${newState}`},{
+        where:{
+            id: `${id}`
+            
+        }
+    });
+    }
+
+    updateEvent(name="",start_date="",end_date=""){
+    if (name.length>0 && start_date.length>0 && end_date.length>0){
+        await EventModel.update({ name: `${name}`, start_date:`${start_date}` , end_date:`${end_date}`}, {
+            where: {
+              name: `${name}`,
+              start_date:`${start_date}`,
+              end_date:`${end_date}`
+            }
+          })
+    }if(name.length>0){
+        await EventModel.update({ name: `${name}`}, {
+            where: {
+              name: `${name}`
+            }
+          })
+    }if(start_date.length>0){
+        await EventModel.update({start_date:`${start_date}`}, {
+            where: {
+              start_date: `${start_date}`
+            }
+          })
+    }if(end_date.length>0){
+        await EventModel.update({end_date:`${end_date}`}, {
+            where: {
+              end_date: `${end_date}`
+            }
+        })
+    }    
+    }
 }
