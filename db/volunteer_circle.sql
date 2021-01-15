@@ -44,7 +44,7 @@ CREATE TABLE `Skill` (
   `id` int NOT NULL,
   `user_id` int NOT NULL,
   `name` varchar(150) NOT NULL,
-  `verifications` int unsigned,
+  `validations` int unsigned,
   PRIMARY KEY (`id`),
   CONSTRAINT FK_UserSkill FOREIGN KEY (user_id) 
   REFERENCES User(id) ON DELETE CASCADE ON UPDATE CASCADE

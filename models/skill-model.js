@@ -21,7 +21,7 @@ const SkillModel=sequelize.define('Skill',{
         }
     },
     name:DataTypes.STRING,
-    verifications: DataTypes.INTEGER
+    validations: DataTypes.INTEGER
 },{
     sequelize,
     modelName: 'Skill',
