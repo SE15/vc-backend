@@ -5,7 +5,7 @@ const sequelize = new Sequelize('mysql::memory:');
 
 
 
-const VerificationModel=sequelize.define('Verification',{
+const ValidationModel=sequelize.define('validation',{
     skill_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
@@ -17,7 +17,7 @@ const VerificationModel=sequelize.define('Verification',{
 
         }
     },
-    verified_by: {
+    validated_by: {
         type: DataTypes.INTEGER,
         allowNull: false,
         primaryKey:true,
@@ -30,11 +30,11 @@ const VerificationModel=sequelize.define('Verification',{
     }	
 },{
     sequelize,
-    modelName: 'Verification',
-    tableName:'verification',
+    modelName: 'Validation',
+    tableName:'validation',
     
 });
 
 
 
-module.exports=VerificationModel;
+module.exports=ValidationModel;
