@@ -1,4 +1,4 @@
-const { Sequelize, DataTypes } = require('sequelize');
+const { Sequelize, DataTypes ,Deferrable} = require('sequelize');
 const UserModel = require('./user-model');
 const sequelize = new Sequelize('mysql::memory:');
 
@@ -7,7 +7,8 @@ const SkillModel=sequelize.define('Skill',{
     id: {
         type: DataTypes.INTEGER,
         allowNull: false,
-        autoincrement: true
+        autoincrement: true,
+        primaryKey:true
     },
     usert_id: {
         type: DataTypes.INTEGER,
@@ -28,7 +29,6 @@ const SkillModel=sequelize.define('Skill',{
     
 });
 
-await SkillModel.sync({ force: true });
-console.log("The table for the User model was just (re)created!");
+
 
 module.exports=SkillModel;
