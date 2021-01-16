@@ -31,7 +31,7 @@ const ConnectionModel=sequelize.define('Connection',{
     sequelize,
     timestamps: false,
     modelName: 'Connection',
-    tableName:'connection',
+    tableName:'Connection',
     
 });
 

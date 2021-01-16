@@ -32,7 +32,7 @@ const RecommendationModel=sequelize.define('Recomendation',{
     sequelize,
     timestamps: false,
     modelName: 'Reccomendation',
-    tableName:'reccomendation',
+    tableName:'Reccomendation',
 });
 
 

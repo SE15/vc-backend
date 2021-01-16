@@ -24,7 +24,7 @@ const SkillModel=sequelize.define('Skill',{
     sequelize,
     timestamps: false,
     modelName: 'Skill',
-    tableName:'Sill',
+    tableName:'Skill',
     
 });
 

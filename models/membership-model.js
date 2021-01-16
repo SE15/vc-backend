@@ -44,7 +44,7 @@ const MembershipModel=sequelize.define('Membership',{
     sequelize,
     timestamps: false,
     modelName: 'Membership',
-    tableName:'membership',
+    tableName:'Membership',
     
 });
 

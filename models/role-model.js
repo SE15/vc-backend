@@ -15,7 +15,7 @@ const RoleModel=sequelize.define('Role',{
     sequelize,
     timestamps: false,
     modelName: 'Role',
-    tableName:'role',
+    tableName:'Role',
 });
 
 module.exports=RoleModel;
