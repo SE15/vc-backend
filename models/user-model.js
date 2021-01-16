@@ -7,9 +7,14 @@ const UserModel=sequelize.define('User',{
     id: {
         type: DataTypes.INTEGER,
         autoincrement: true,
+        allowNull: false,
+        primaryKey: true
+    },
+    first_name: {
+        type: DataTypes.STRING,
         allowNull: false
     },
-    name: {
+    last_name: {
         type: DataTypes.STRING,
         allowNull: false
     },
@@ -33,8 +38,7 @@ const UserModel=sequelize.define('User',{
     }
 });
 
-await User.sync({ force: true });
-console.log("The table for the User model was just (re)created!");
+
 
 
 module.exports=UserModel;

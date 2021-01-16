@@ -1,4 +1,4 @@
-const { Sequelize, DataTypes } = require('sequelize');
+const { Sequelize, DataTypes,Deferrable } = require('sequelize');
 const UserModel = require('./user-model');
 const sequelize = new Sequelize('mysql::memory:');
 
@@ -7,20 +7,24 @@ const RecommendationModel=sequelize.define('Recomendation',{
     user_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
+        primaryKey: true,
         references:{
             model:UserModel,
             key: 'id',
-            deferrable: Deferrable.INITIALLY_IMMEDIATE
+            deferrable: Deferrable.INITIALLY_IMMEDIATE,
+            
 
         }
     },
     recommended_by: {
         type: DataTypes.INTEGER,
         allowNull: false,
+        primaryKey: true,
         references:{
             model:UserModel,
             key: 'id',
-            deferrable: Deferrable.INITIALLY_IMMEDIATE
+            deferrable: Deferrable.INITIALLY_IMMEDIATE,
+            
 
         }
     },
@@ -32,7 +36,5 @@ const RecommendationModel=sequelize.define('Recomendation',{
     
 });
 
-await RecommendationModel.sync({ force: true });
-console.log("The table for the User model was just (re)created!");
 
 module.exports=RecommendationModel;

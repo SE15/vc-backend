@@ -6,7 +6,8 @@ const EventModel=sequelize.define('Event',{
     id: {
         type: DataTypes.INTEGER,
         autoincrement: true,
-        allowNull: false
+        allowNull: false,
+        primaryKey:true
     },
     name: {
         type: DataTypes.STRING,
@@ -26,7 +27,6 @@ const EventModel=sequelize.define('Event',{
     
 });
 
-await Event.sync({ force: true });
-console.log("The table for the User model was just (re)created!");
+
 
 module.exports=EventModel;

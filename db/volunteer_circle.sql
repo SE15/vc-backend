@@ -1,7 +1,8 @@
 CREATE TABLE `User` (
   `id` int NOT NULL AUTO_INCREMENT,
-  `name` varchar(150) NOT NULL,
-  `user_name` varchar(50) NOT NULL,
+  `first_name` varchar(150) NOT NULL,
+  `last_name` varchar(150) NOT NULL,
+  `email` varchar(50) NOT NULL,
   `password` char(32) NOT NULL,
   `profile_pic` varchar(150),
   PRIMARY KEY (`id`)
@@ -43,19 +44,19 @@ CREATE TABLE `Skill` (
   `id` int NOT NULL,
   `user_id` int NOT NULL,
   `name` varchar(150) NOT NULL,
-  `verifications` int unsigned,
+  `validations` int unsigned,
   PRIMARY KEY (`id`),
   CONSTRAINT FK_UserSkill FOREIGN KEY (user_id) 
   REFERENCES User(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
-CREATE TABLE `Verification` (
+CREATE TABLE `Validation` (
   `skill_id` int NOT NULL,
-  `verified_by` int NOT NULL,
-  PRIMARY KEY (`skill_id`, `verified_by`),
-  CONSTRAINT FK_SkillVerification FOREIGN KEY (skill_id) 
+  `validated_by` int NOT NULL,
+  PRIMARY KEY (`skill_id`, `validated_by`),
+  CONSTRAINT FK_SkillValidation FOREIGN KEY (skill_id) 
   REFERENCES Skill(id) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT FK_SkilLVerifiedBy FOREIGN KEY (verified_by) 
+  CONSTRAINT FK_SkilLvalidatedBy FOREIGN KEY (validated_by) 
   REFERENCES User(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
