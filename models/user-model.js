@@ -1,19 +1,22 @@
-const { Sequelize, DataTypes } = require('sequelize');
-const sequelize = new Sequelize('mysql::memory:');
+const { DataTypes } = require('sequelize');
+const sequelize = require('../config/database');
 const bcrypt = require("bcrypt");
-
 
 const UserModel=sequelize.define('User',{
     id: {
         type: DataTypes.INTEGER,
         autoincrement: true,
-        allowNull: false
+        primaryKey: true
     },
-    name: {
+    first_name: {
         type: DataTypes.STRING,
         allowNull: false
     },
-    username:{
+    last_name: {
+        type: DataTypes.STRING,
+        allowNull: false
+    },
+    email:{
         type: DataTypes.STRING,
         allowNull: false
     },
@@ -21,8 +24,9 @@ const UserModel=sequelize.define('User',{
     profile_pic: DataTypes.STRING
 },{
     sequelize,
-    modelName: 'User',
-    tableName:'user',
+    modelName:'User',
+    tableName:'User',
+    timestamps: false,
     instanceMethods: {
         generateHash(password) {
             return bcrypt.hash(password, bcrypt.genSaltSync(8));
@@ -33,8 +37,4 @@ const UserModel=sequelize.define('User',{
     }
 });
 
-await User.sync({ force: true });
-console.log("The table for the User model was just (re)created!");
-
-
-module.exports=UserModel;
+module.exports = UserModel;

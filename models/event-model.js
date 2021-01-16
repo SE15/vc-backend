@@ -1,12 +1,11 @@
-const { Sequelize, DataTypes } = require('sequelize');
-const sequelize = new Sequelize('mysql::memory:');
-
+const { DataTypes } = require('sequelize');
+const sequelize = require('../config/database');
 
 const EventModel=sequelize.define('Event',{
     id: {
         type: DataTypes.INTEGER,
         autoincrement: true,
-        allowNull: false
+        primaryKey:true
     },
     name: {
         type: DataTypes.STRING,
@@ -21,12 +20,8 @@ const EventModel=sequelize.define('Event',{
     state:DataTypes.ENUM('created', 'occured', 'deleted', 'closed')	
 },{
     sequelize,
+    timestamps: false,
     modelName: 'Event',
-    tableName:'event',
-    
+    tableName:'Event', 
 });
-
-await Event.sync({ force: true });
-console.log("The table for the User model was just (re)created!");
-
 module.exports=EventModel;

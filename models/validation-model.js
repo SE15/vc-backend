@@ -1,14 +1,13 @@
-const { Sequelize, DataTypes } = require('sequelize');
-const SkillModel = require('./skill-model');
+const { DataTypes, Deferrable } = require('sequelize');
 const UserModel = require('./user-model');
-const sequelize = new Sequelize('mysql::memory:');
+const SkillModel = require('./skill-model');
+const sequelize = require('../config/database');
 
-
-
-const VerificationModel=sequelize.define('Verification',{
+const ValidationModel=sequelize.define('validation',{
     skill_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
+        primaryKey:true,
         references:{
             model:SkillModel,
             key: 'id',
@@ -16,9 +15,10 @@ const VerificationModel=sequelize.define('Verification',{
 
         }
     },
-    verified_by: {
+    validated_by: {
         type: DataTypes.INTEGER,
         allowNull: false,
+        primaryKey:true,
         references:{
             model:UserModel,
             key: 'id',
@@ -28,12 +28,9 @@ const VerificationModel=sequelize.define('Verification',{
     }	
 },{
     sequelize,
-    modelName: 'Verification',
-    tableName:'verification',
-    
+    timestamps: false,
+    modelName: 'Validation',
+    tableName:'Validation', 
 });
 
-await VerificationModel.sync({ force: true });
-console.log("The table for the User model was just (re)created!");
-
-module.exports=VerificationModel;
+module.exports=ValidationModel;

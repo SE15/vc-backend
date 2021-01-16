@@ -6,9 +6,17 @@ const SkillModel=require('../models/skill-model');
 const ConnectionModel=require('../models/connection-model');
 const ReccomendationModel=require('../models/recommendation-model');
 const MembershipModel=require('../models/membership-model');
-
+const sequelize=require('../config/database')
 class User{
-    addUser(fullname,username,password,profile_pic){
+    constructor(){
+        try {
+            sequelize.authenticate();
+            console.log('Connection has been established successfully.');
+        } catch (error) {
+            console.error('Unable to connect to the database:', error);
+        }
+    }
+    async addUser(fullname,username,password,profile_pic){
     const newUser= await UserModel.create({
         name: `${fullname}`,
         username: `${username}`,
@@ -16,16 +24,17 @@ class User{
         profile_pic: `${profile_pic}`
 
     });
+    return newUser;
 }
 
-    getAllUsers(){
+    async getAllUsers(){
     const users=UserModel.findAll({
         attributes:['name','username','profile_pic']
     });
     return users;
 }
 
-    searchUser(username){
+    async searchUser(username){
 
     const user=Post.findAll({
         where:{
@@ -36,7 +45,7 @@ class User{
 
 }
 
-    deleteAccount(username){
+    async deleteAccount(username){
     await UserModel.destroy({
         where:{
             username: `${username}`
@@ -44,7 +53,7 @@ class User{
     });
 }
 
-    changePassword(username,password){
+    async changePassword(username,password){
     
     pass= bcrypt.hash(password, bcrypt.genSaltSync(8));
     
@@ -55,7 +64,7 @@ class User{
     })
 }
 
-    editAccount(username,name="",profile_pic=""){
+    async editAccount(username,name="",profile_pic=""){
     if (name.length>0 && profile_pic.length>0){
         await UserModel.update({ name: `${name}` , profile_pic:`${profile_pic}`}, {
             where: {
@@ -77,7 +86,7 @@ class User{
     }
     }
 
-    addEvent(name,location,start_date,end_date){
+    async addEvent(name,location,start_date,end_date){
     const newEvent= await EventModel.create({
         name: `${name}`,
         location: `${location}`,
@@ -88,7 +97,7 @@ class User{
     });
     }
 
-    getAllEvents(){
+    async getAllEvents(){
     const events=EventModel.findAll({
         attributes:['name','location','start_date','end_date','state']
     });
@@ -96,7 +105,7 @@ class User{
     return events;
     }
 
-    searchEvent(name){
+    async searchEvent(name){
 
     const event=Post.findAll({
         where:{
@@ -107,7 +116,7 @@ class User{
 
     }
 
-    deleteEvent(id){
+    async deleteEvent(id){
     await EventModel.destroy({
         where:{
             id: `${id}`
@@ -116,7 +125,7 @@ class User{
     }
 
 
-    changeState(newState){
+    async changeState(newState){
     await EventModel.update({state: `${newState}`},{
         where:{
             id: `${id}`
@@ -125,7 +134,7 @@ class User{
     });
     }
 
-    updateEvent(name="",start_date="",end_date=""){
+    async updateEvent(name="",start_date="",end_date=""){
     if (name.length>0 && start_date.length>0 && end_date.length>0){
         await EventModel.update({ name: `${name}`, start_date:`${start_date}` , end_date:`${end_date}`}, {
             where: {
@@ -155,3 +164,6 @@ class User{
     }    
     }
 }
+
+user=new User();
+user.getAllUsers();

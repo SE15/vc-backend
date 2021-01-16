@@ -1,13 +1,11 @@
-const { Sequelize, DataTypes } = require('sequelize');
-const sequelize = new Sequelize('mysql::memory:');
-
-
+const { DataTypes } = require('sequelize');
+const sequelize = require('../config/database');
 
 const RoleModel=sequelize.define('Role',{
     id: {
         type: DataTypes.INTEGER,
         autoincrement: true,
-        allowNull: false
+        primaryKey:true
     },
     name: {
         type: DataTypes.STRING,
@@ -15,12 +13,9 @@ const RoleModel=sequelize.define('Role',{
     }	
 },{
     sequelize,
+    timestamps: false,
     modelName: 'Role',
     tableName:'role',
-    
 });
-
-await RoleModel.sync({ force: true });
-console.log("The table for the User model was just (re)created!");
 
 module.exports=RoleModel;

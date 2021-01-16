@@ -1,12 +1,13 @@
-const { Sequelize, DataTypes } = require('sequelize');
+const { DataTypes,Deferrable } = require('sequelize');
 const UserModel = require('./user-model');
-const sequelize = new Sequelize('mysql::memory:');
+const sequelize = require('../config/database');
 
 
 const ConnectionModel=sequelize.define('Connection',{
     requester_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
+        primaryKey:true,
         references:{
             model:UserModel,
             key: 'id',
@@ -17,6 +18,7 @@ const ConnectionModel=sequelize.define('Connection',{
     recipient_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
+        primaryKey:true,
         references:{
             model:UserModel,
             key: 'id',
@@ -27,12 +29,10 @@ const ConnectionModel=sequelize.define('Connection',{
     state:DataTypes.ENUM('pending', 'accepted', 'rejected')	
 },{
     sequelize,
+    timestamps: false,
     modelName: 'Connection',
     tableName:'connection',
     
 });
-
-await ConnectionModel.sync({ force: true });
-console.log("The table for the User model was just (re)created!");
 
 module.exports=ConnectionModel;

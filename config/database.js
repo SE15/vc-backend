@@ -8,14 +8,11 @@ const { Sequelize } = require('sequelize');
 //    database: process.env.DB_DB,
 //});
 
-const sequelize = new Sequelize(process.env.DB_DB, process.env.DB_USER,  process.env.DB_PASS, {
-    host: process.env.DB_HOST,
+//TODO: Convert these config variables to env when deploying
+const sequelize = new Sequelize('YDu6zWJ1mT', 'YDu6zWJ1mT',  'r1S3iks9pv', {
+    host: 'remotemysql.com',
+    port: 3306,
     dialect: 'mysql'
   });
-try {
-    await sequelize.authenticate();
-    console.log('Connection has been established successfully.');
-} catch (error) {
-    console.error('Unable to connect to the database:', error);
-}
+
 module.exports=sequelize;
