@@ -6,7 +6,11 @@ const SkillModel=require('../models/skill-model');
 const ConnectionModel=require('../models/connection-model');
 const ReccomendationModel=require('../models/recommendation-model');
 const MembershipModel=require('../models/membership-model');
-const sequelize=require('../config/database')
+const sequelize=require('../config/database');
+const { raw } = require('express');
+const { or } = require('sequelize');
+const {Op} = require("sequelize");
+
 class User{
     constructor(){
         try {
@@ -16,39 +20,54 @@ class User{
             console.error('Unable to connect to the database:', error);
         }
     }
-    async addUser(fullname,username,password,profile_pic){
+    async addUser(first_name,last_name,email,password,profile_pic){
     const newUser= await UserModel.create({
-        name: `${fullname}`,
-        username: `${username}`,
+        first_name: `${first_name}`,
+        last_name:`${last_name}`,
+        email: `${email}`,
         password: `${password}`,
         profile_pic: `${profile_pic}`
 
     });
-    return newUser;
 }
 
-    async getAllUsers(){
-    const users=UserModel.findAll({
-        attributes:['name','username','profile_pic']
-    });
-    return users;
+async getAllUsers(){
+    try{   
+        const users=UserModel.findAll({
+        attributes:['first_name','last_name','email','profile_pic'], raw: true
+
+        })
+
+        return users;
+
+    }catch(error){
+        console.log(`Error : ${error}`);
+    }      
 }
 
-    async searchUser(username){
 
-    const user=Post.findAll({
-        where:{
-            username: `${username}`
-        }
-    });
-    return user;
+async searchUser(name){
+    try{
+  
+        const user=UserModel.findAll({
+            attributes:['first_name','last_name','profile_pic'], raw: true,
+            where:{
+                [Op.or]:[{first_name: `${name}`},{last_name: `${name}`}]
+                    
+            }
+    
+        });
+        return user;
+    }catch(error){
+        console.log(`Error : ${error}`);
+    }
 
 }
 
-    async deleteAccount(username){
+    async deleteAccount(email){
     await UserModel.destroy({
         where:{
-            username: `${username}`
+            email: `${email}`
         }
     });
 }
@@ -95,11 +114,12 @@ class User{
         state:'created'
 
     });
+    return newEvent;
     }
 
     async getAllEvents(){
     const events=EventModel.findAll({
-        attributes:['name','location','start_date','end_date','state']
+        attributes:['name','location','start_date','end_date','state'],raw:true
     });
 
     return events;
@@ -107,10 +127,12 @@ class User{
 
     async searchEvent(name){
 
-    const event=Post.findAll({
-        where:{
-            name: `${name}`
-        }
+    const event=EventModel.findAll({
+        attributes:['name','location','start_date','end_date','state'],raw:true,
+        where:sequelize.or(
+            {name:[ `${name}`]},
+            {location:[ `${name}`]}
+        )
     });
     return event;
 
@@ -165,5 +187,6 @@ class User{
     }
 }
 
-user=new User();
-user.getAllUsers();
+user1=new User();
+user1.searchEvent().then(user1=>console.log(user1));
+
