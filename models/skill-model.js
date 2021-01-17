@@ -8,7 +8,7 @@ const SkillModel=sequelize.define('Skill',{
         autoincrement: true,
         primaryKey:true
     },
-    usert_id: {
+    user_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
         references:{
