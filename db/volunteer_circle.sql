@@ -5,6 +5,7 @@ CREATE TABLE `User` (
   `email` varchar(100) NOT NULL,
   `password` char(32) NOT NULL,
   `profile_pic` varchar(150),
+  `is_deleted` tinyint(1) NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`)
 );
 
