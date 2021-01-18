@@ -10,6 +10,8 @@ const sequelize=require('../config/database');
 const { raw } = require('express');
 const { or } = require('sequelize');
 const {Op} = require("sequelize");
+const Connection = require('./user/connection.js');
+const Skill = require('./user/skill');
 
 class User{
     constructor(){
@@ -32,22 +34,19 @@ class User{
 }
 
 async getAllUsers(){
-    try{   
+      
         const users=UserModel.findAll({
         attributes:['first_name','last_name','email','profile_pic'], raw: true
 
         })
 
         return users;
-
-    }catch(error){
-        console.log(`Error : ${error}`);
-    }      
+          
 }
 
 
 async searchUser(name){
-    try{
+    
   
         const user=UserModel.findAll({
             attributes:['first_name','last_name','profile_pic'], raw: true,
@@ -58,10 +57,7 @@ async searchUser(name){
     
         });
         return user;
-    }catch(error){
-        console.log(`Error : ${error}`);
-    }
-
+    
 }
 
     async deleteAccount(email){
@@ -185,8 +181,85 @@ async searchUser(name){
         })
     }    
     }
+
+    async addConnection(recipient_id) {
+        //temp data
+        
+        this.requester_id = 2;
+        let reque_id=this.requester_id;
+        let checkin=null;
+            
+        checkin = await Connection.checkValidations(recipient_id,reque_id);
+          
+           
+        if(checkin===true){
+                    
+            let connection = new Connection({requester_id: this.requester_id, recipient_id: recipient_id});
+            return await connection.saveToDatabase(true);
+            //return connection;
+       
+        }else{
+            return "Already exists";
+        }
+    }
+
+    async  removeConnection(recipient_id) {
+        //temp data
+        this.requester_id = 2;
+        let reque_id=this.requester_id;
+            
+        let connection = await Connection.create(recipient_id,reque_id);
+        return await connection.destroy();
+        
+    }
+
+    async  respondConnection(recipient_id,accept){
+
+        this.requester_id = 2;
+        let reque_id=this.requester_id;
+        let res = null;
+    
+        
+        res = await Connection.updateState(recipient_id,reque_id,accept);
+        return res;
+    
+    }
+
+    async validateSkill(id) {
+        //temp values
+        this.user_id = 10;
+
+        let skill = await Skill.create(id);
+        return await skill.incrementValidations(this.user_id);
+        
+    }
+
+    async addSkill(name) {
+        //temp data
+        this.user_id = 2;
+    
+        let skill = new Skill({user_id: this.user_id, name: name});
+        return await skill.saveToDatabase(true);
+        //return skill;
+        
+    }
+
+    async removeSkill(id) {
+        //temp data
+        this.user_id = 1;
+    
+        let skill = await Skill.create(id);
+        return await skill.destroy();
+        
+    }
+    
 }
 
 user1=new User();
-user1.searchEvent().then(user1=>console.log(user1));
+//user1.addConnection(11).then(result => console.log('Connection Added: ', result));
+//user1.removeConnection(11).then(result => console.log('Connection Removed: ', result));
+//user1.respondConnection(10,false).then(result => console.log('Connection state updated: ', result));
 
+//user1.validateSkill(4).then(result => console.log('Skill Validated:', result));
+//user1.addSkill('node hh').then(result => console.log('Skill Added: ', result));
+//user1.removeSkill(60).then(result => console.log('Skill Removed: ', result));
