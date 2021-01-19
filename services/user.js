@@ -12,6 +12,7 @@ const { or } = require('sequelize');
 const {Op} = require("sequelize");
 const Connection = require('./user/connection.js');
 const Skill = require('./user/skill');
+const Recommendation = require('./user/recommendation')
 
 class User{
     constructor(){
@@ -252,6 +253,55 @@ async searchUser(name){
         return await skill.destroy();
         
     }
+
+    async submitRecommendation(user_id,description) {
+        //temp data
+        this.recommended_by = 11;
+        let recommended_by= this.recommended_by
+        let check_validation=null;
+    
+        check_validation = await Recommendation.checkValidations(user_id,recommended_by);
+    
+        if (check_validation){
+            
+            let recommendation = new Recommendation({user_id: user_id, recommended_by: this.recommended_by,description:description});
+            return await recommendation.saveToDatabase();
+            //return recommendation;
+        }else{
+            return "Already Recommended";
+        }   
+        
+    }
+    
+    async showRecommendation(user_id) {
+        //temp data
+    
+            
+            let recommendation = new Recommendation({user_id:user_id});
+            return await recommendation.getInformation();
+            
+        
+    }
+
+    async viewProfile(user_id){
+        user_id:user_id;
+       
+        const user=UserModel.findAll({
+            attributes:['first_name','last_name','profile_pic'], raw: true,
+            where:{
+                id:user_id
+                    
+            }
+    
+            })
+        const records=this.showRecommendation(user_id);
+        const mergeduser=[{...user},{...records}];
+        //return records;
+        //return user;
+        
+        return mergeduser;
+    }
+    
     
 }
 
@@ -263,3 +313,7 @@ user1=new User();
 //user1.validateSkill(4).then(result => console.log('Skill Validated:', result));
 //user1.addSkill('node hh').then(result => console.log('Skill Added: ', result));
 //user1.removeSkill(60).then(result => console.log('Skill Removed: ', result));
+
+//user1.submitRecommendation(1,'recommnded').then(result => console.log('Recommendation Added: ', result));
+//user1.showRecommendation(1).then(result=>console.log('Recommendation Records: ',result));
+//user1.viewProfile(1).then(result=>console.log('Profile: ', result));
