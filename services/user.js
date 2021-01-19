@@ -12,7 +12,8 @@ const { or } = require('sequelize');
 const {Op} = require("sequelize");
 const Connection = require('./user/connection.js');
 const Skill = require('./user/skill');
-const Recommendation = require('./user/recommendation')
+const Recommendation = require('./user/recommendation');
+const md5 = require('md5');
 
 class User{
     constructor(){
@@ -24,12 +25,14 @@ class User{
         }
     }
     async addUser(first_name,last_name,email,password,profile_pic){
-    const newUser= await UserModel.create({
-        first_name: `${first_name}`,
-        last_name:`${last_name}`,
-        email: `${email}`,
-        password: `${password}`,
-        profile_pic: `${profile_pic}`
+
+        let hashPassword = md5(password);
+        const newUser= await UserModel.create({
+            first_name: `${first_name}`,
+            last_name:`${last_name}`,
+            email: `${email}`,
+            password: `${hashPassword}`,
+            profile_pic: `${profile_pic}`
 
     });
 }
@@ -61,24 +64,49 @@ async searchUser(name){
     
 }
 
-    async deleteAccount(email){
-    await UserModel.destroy({
-        where:{
-            email: `${email}`
-        }
-    });
-}
+    async deleteAccount(){
 
-    async changePassword(username,password){
-    
-    pass= bcrypt.hash(password, bcrypt.genSaltSync(8));
-    
-    await UserModel.update({password: `${password}`},{
-        where:{
-            username: 'username'
+        //temp data
+        this.user_id = 16;
+        await UserModel.update({ 
+                    
+            is_deleted: 1},{
+                where: {
+                    [Op.and]: [
+                    {id: this.user_id},
+                    {is_deleted:0}
+                    ]     
+        }});
+        return true;        
+    }
+
+    async changePassword(oldPassword,newPassword){
+        //temp data
+        this.user_id=16;
+        
+         
+
+        let result = await UserModel.findOne({where: {id: this.user_id}});
+        let hashPassword = result.password;
+        let updatePassword = md5(newPassword);
+        if(hashPassword === md5(oldPassword)){
+            await UserModel.update({ 
+                    
+                password: updatePassword},{
+                    where: {
+                        [Op.and]: [
+                        {id: this.user_id},
+                        {is_deleted:0}
+                        ]     
+            }});
+            return true;        
+
+        }else{
+            console.log('Password does not match');
+            return false;
         }
-    })
-}
+    
+    }
 
     async editAccount(username,name="",profile_pic=""){
     if (name.length>0 && profile_pic.length>0){
@@ -317,3 +345,7 @@ user1=new User();
 //user1.submitRecommendation(1,'recommnded').then(result => console.log('Recommendation Added: ', result));
 //user1.showRecommendation(1).then(result=>console.log('Recommendation Records: ',result));
 //user1.viewProfile(1).then(result=>console.log('Profile: ', result));
+
+user1.deleteAccount().then(result => console.log('Account Deleted: ', result));
+//user1.changePassword("543","123").then(result => console.log('Password Changed: ', result));;
+//user1.addUser("Chamara", "Weerasinghe","chamara@gmail.com","123");
