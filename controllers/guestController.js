@@ -61,56 +61,6 @@ guestController.viewProfile = async (req, res, next) => {
     }
   };
 
-//user event functions
-guestController.searchEvents = async (req, res, next) => {
-    try {
-        const keyword = req.params.keyword;    
-        const events = await user.searchEvents(keyword);
-        /**
-         * if events.length
-         *      convert events array into json
-         *      send json
-         * else 
-         *      "No result found"
-         * **assume above users is the json object
-        */
-
-        /**
-         * success array[event(name)]
-         *  error empty array[]
-         * "No result found"
-         */
-        if(events.length){
-            return res.json(events);
-        }else{
-            return res.json({msg: "No result found"});
-        }
-        //res.end('<html><body><p><%=users></p></body></html>');
-        
-    } catch (err) {
-      next(err);
-    }
-  };
-
-guestController.viewEvent = async (req, res, next) => {
-    try {
-        const eventID = req.params.id;    
-        const event = await user.viewEvent(eventID);
-
-        return res.json(event);
-
-        /**
-         * success array[name,location,start_date,end_date,status]	
-         * error exception
-         */
-
-        //res.end('<html><body><p><%=users></p></body></html>');
-        
-    } catch (err) {
-      next(err);
-    }
-  };
-
 guestController.createAccount = async (req, res, next) => {
     try {
         const { name, email, password, profilePic } = req.body;

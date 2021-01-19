@@ -18,16 +18,4 @@ router.delete('/users/', authorization, userController.deleteAccount);
 router.put('/users/changepwd', authorization, userController.changePassword);
 router.put('/users/edit', authorization, userController.editProfile);
 
-//user event routes
-router.get('/events/', authorization, userController.searchEvents);
-router.get('/events/:id', authorization, userController.viewEvent);
-router.put('/events/:id/join', authorization, userController.joinEvent);
-router.put('/events/:id/leave', authorization, userController.leaveEvent);
-router.put('/events/:id', authorization, userController.updateEvent);
-router.delete('/events/:id', authorization, userController.deleteEvent);
-
-//user event membership routes
-router.put('/memberships/:id', authorization, userController.updateRole);
-router.put('/memberships/acceptRequest/:id', authorization, userController.acceptEventRequest);
-
 module.exports = router;
