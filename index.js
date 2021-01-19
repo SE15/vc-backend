@@ -21,6 +21,27 @@ server.listen(port, hostname, () => {
     console.log(`Server running at http://${hostname}:${port}/`);
 });
 
-// Routes
-const routes = require('./routes/api/users');
-app.use('/api', routes);
+//user Routes
+const userseRoutes = require('./routes/api/users');
+app.use('/api', usersRoutes);
+
+//guest Routes
+const guestsRoutes = require('./routes/api/guests');
+app.use('/api/guests', guestsRoutes);
+
+// catch 404 and forward to error handler
+app.use((req, res, next) => {
+    const err = new Error('Not Found');
+    err.status = 404;
+    next(err);
+  });
+  
+  // error handler
+  // no stacktraces leaked to user unless in development environment
+  app.use((err, req, res, next) => {
+    if (err.status === 404) {
+        return res.json({msg: err});
+    } else {
+        return res.json({msg: err});
+    }
+  });
