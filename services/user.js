@@ -211,6 +211,12 @@ async searchUser(name){
     }    
     }
 
+    async viewEvent(event_id){
+        let event = new Event({event_id:event_id});
+            return await event.getInformation(event_id);
+    }
+    
+
     async addConnection(recipient_id) {
         //temp data
         
@@ -314,20 +320,33 @@ async searchUser(name){
     async viewProfile(user_id){
         user_id:user_id;
        
-        const user=UserModel.findAll({
+        const user=await UserModel.findAll({
             attributes:['first_name','last_name','profile_pic'], raw: true,
             where:{
                 id:user_id
                     
             }
     
-            })
-        const records=this.showRecommendation(user_id);
-        const mergeduser=[{...user},{...records}];
+            });
+        const records= await RecommendationModel.findAll({
+            attributes:['Recommended_by','description'], raw: true,
+            where:
+                [{user_id:user_id}]
+        });
+    
+        const skills=await SkillModel.findAll({
+            attributes:['name','validations'], raw: true,
+            where:
+                [{user_id:user_id}]
+        })
         //return records;
         //return user;
-        
-        return mergeduser;
+        //return mergeduser;
+        return [
+            user,
+            records,
+            skills
+        ]
     }
     
     
@@ -346,6 +365,7 @@ user1=new User();
 //user1.showRecommendation(1).then(result=>console.log('Recommendation Records: ',result));
 //user1.viewProfile(1).then(result=>console.log('Profile: ', result));
 
-user1.deleteAccount().then(result => console.log('Account Deleted: ', result));
+//user1.deleteAccount().then(result => console.log('Account Deleted: ', result));
 //user1.changePassword("543","123").then(result => console.log('Password Changed: ', result));;
 //user1.addUser("Chamara", "Weerasinghe","chamara@gmail.com","123");
+// viewEvent(1).then(result=>console.log("Event Details: ",result));
