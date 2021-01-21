@@ -1,11 +1,9 @@
 const Sequelize= require('sequelize');
 const bcrypt = require("bcrypt");
 const UserModel=require('../models/user-model');
-const EventModel=require('../models/event-model');
 const SkillModel=require('../models/skill-model');
 const ConnectionModel=require('../models/connection-model');
 const ReccomendationModel=require('../models/recommendation-model');
-const MembershipModel=require('../models/membership-model');
 const sequelize=require('../config/database');
 const { raw } = require('express');
 const { or } = require('sequelize');
@@ -110,28 +108,91 @@ class User{
     
     }
 
-    async editAccount(username,name="",profile_pic=""){
-    if (name.length>0 && profile_pic.length>0){
-        await UserModel.update({ name: `${name}` , profile_pic:`${profile_pic}`}, {
-            where: {
-              username: `${username}`
-            }
-          })
-    }else if(name.length>0){
-        await UserModel.update({ name: `${name}`}, {
-            where: {
-              username: `${username}`
-            }
-          })
-    }else if(profile_pic.length>0){
-        await UserModel.update({profile_pic:`${profile_pic}`}, {
-            where: {
-              username: `${username}`
-            }
-          })
-    }
-    }
+     //method for all the attributes not passes when editing profile 
+     async editProfile(details){
+        let user_id=2;
+        var first_name=details[0].first_name;
+        var last_name=details[0].last_name;
+        var profile_pic=details[0].profile_pic;
+        if (first_name==undefined && last_name==undefined && profile_pic==undefined){
+             return "You didn't made any changes";
+        
+        }else if(first_name!=undefined && last_name==undefined && profile_pic!=undefined){
+            await UserModel.update({ 
+                first_name:frist_name , 
+                profile_pic:profile_pic}, {
+                where: {
+                    id:user_id
+                }
+              })
+            return "successfully Update Details";
 
+        }else if(first_name!=undefined && last_name!=undefined && profile_pic==undefined){
+            await UserModel.update({ 
+                first_name:frist_name , 
+                last_name:last_name}, {
+                where: {
+                    id:user_id
+                }
+              })
+            return "successfully Update Details";
+
+        }else if(first_name==undefined && last_name!=undefined && profile_pic!=undefined){
+            await UserModel.update({  
+                last_name:last_name,
+                profile_pic:profile_pic}, {
+                where: {
+                    id:user_id
+                }
+              })
+            return "successfully Update Details";
+
+        }else if(first_name==undefined && last_name==undefined && profile_pic!=undefined){
+            await UserModel.update({ 
+                profile_pic:profile_pic}, {
+                where: {
+                    id:user_id
+                }
+              })
+            return "successfully Update Details";
+
+        }else if(first_name==undefined && last_name==undefined && profile_pic!=undefined){
+            await UserModel.update({  
+                last_name:last_name}, {
+                where: {
+                    id:user_id
+                }
+              })
+            return "successfully Update Details";
+
+        }else if(first_name==undefined && last_name!=undefined && profile_pic!=undefined){
+            await UserModel.update({ 
+                first_name:frist_name}, {
+                where: {
+                    id:user_id
+                }
+              })
+            return "successfully Update Details";
+            
+        }
+        }
+
+        /*method for all attributes passes when editing profile
+        async editProfile(details){
+            let user_id=this.user_id;
+            var first_name=details[0].first_name;
+            var last_name=details[0].last_name;
+            var profile_pic=details[0].profile_pic;
+            await UserModel.update({
+                    first_name:first_name,  
+                    last_name:last_name,
+                    profile_pic:profile_pic},{
+                    where: {
+                        id:user_id
+                    }
+                  })
+            return "successfully Update Details";
+        }*/
     
     async addConnection(recipient_id) {
         //temp data
