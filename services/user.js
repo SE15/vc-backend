@@ -24,7 +24,15 @@ class User{
             console.error('Unable to connect to the database:', error);
         }
     }
-    async addUser(first_name,last_name,email,password,profile_pic){
+
+    static async create(id) {
+        //gets the information from the database
+        let userInfo = await UserModel.findOne({where: {id: id}});
+        return new User(userInfo);
+    }
+
+
+    async addUser(first_name,last_name,email,password){
 
         let hashPassword = md5(password);
         const newUser= await UserModel.create({
@@ -32,42 +40,38 @@ class User{
             last_name:`${last_name}`,
             email: `${email}`,
             password: `${hashPassword}`,
-            profile_pic: `${profile_pic}`
-
+     
     });
-}
+    }
 
-async getAllUsers(){
+    async getAllUsers(){
       
         const users=UserModel.findAll({
         attributes:['first_name','last_name','email','profile_pic'], raw: true
-
         })
 
         return users;
           
-}
+    }
 
 
-async searchUser(name){
+    async searchUser(name){
     
-  
         const user=UserModel.findAll({
             attributes:['first_name','last_name','profile_pic'], raw: true,
             where:{
                 [Op.or]:[{first_name: `${name}`},{last_name: `${name}`}]
                     
             }
-    
         });
         return user;
     
-}
+    }
 
     async deleteAccount(){
 
         //temp data
-        this.user_id = 16;
+        this.user_id = 22;
         await UserModel.update({ 
                     
             is_deleted: 1},{
@@ -84,8 +88,6 @@ async searchUser(name){
         //temp data
         this.user_id=16;
         
-         
-
         let result = await UserModel.findOne({where: {id: this.user_id}});
         let hashPassword = result.password;
         let updatePassword = md5(newPassword);
@@ -130,93 +132,7 @@ async searchUser(name){
     }
     }
 
-    async addEvent(name,location,start_date,end_date){
-    const newEvent= await EventModel.create({
-        name: `${name}`,
-        location: `${location}`,
-        start_date: `${start_date}`,
-        end_date: `${end_date}`,
-        state:'created'
-
-    });
-    return newEvent;
-    }
-
-    async getAllEvents(){
-    const events=EventModel.findAll({
-        attributes:['name','location','start_date','end_date','state'],raw:true
-    });
-
-    return events;
-    }
-
-    async searchEvent(name){
-
-    const event=EventModel.findAll({
-        attributes:['name','location','start_date','end_date','state'],raw:true,
-        where:sequelize.or(
-            {name:[ `${name}`]},
-            {location:[ `${name}`]}
-        )
-    });
-    return event;
-
-    }
-
-    async deleteEvent(id){
-    await EventModel.destroy({
-        where:{
-            id: `${id}`
-        }
-    });
-    }
-
-
-    async changeState(newState){
-    await EventModel.update({state: `${newState}`},{
-        where:{
-            id: `${id}`
-            
-        }
-    });
-    }
-
-    async updateEvent(name="",start_date="",end_date=""){
-    if (name.length>0 && start_date.length>0 && end_date.length>0){
-        await EventModel.update({ name: `${name}`, start_date:`${start_date}` , end_date:`${end_date}`}, {
-            where: {
-              name: `${name}`,
-              start_date:`${start_date}`,
-              end_date:`${end_date}`
-            }
-          })
-    }if(name.length>0){
-        await EventModel.update({ name: `${name}`}, {
-            where: {
-              name: `${name}`
-            }
-          })
-    }if(start_date.length>0){
-        await EventModel.update({start_date:`${start_date}`}, {
-            where: {
-              start_date: `${start_date}`
-            }
-          })
-    }if(end_date.length>0){
-        await EventModel.update({end_date:`${end_date}`}, {
-            where: {
-              end_date: `${end_date}`
-            }
-        })
-    }    
-    }
-
-    async viewEvent(event_id){
-        let event = new Event({event_id:event_id});
-            return await event.getInformation(event_id);
-    }
     
-
     async addConnection(recipient_id) {
         //temp data
         
@@ -310,9 +226,8 @@ async searchUser(name){
     async showRecommendation(user_id) {
         //temp data
     
-            
-            let recommendation = new Recommendation({user_id:user_id});
-            return await recommendation.getInformation();
+        let recommendation = new Recommendation({user_id:user_id});
+        return await recommendation.getInformation();
             
         
     }
@@ -348,8 +263,34 @@ async searchUser(name){
             skills
         ]
     }
+
+
+    async  createAccount(info) {
+        //check if the user had already created an account 
+        let guest_email = info[0].email;
+        let cnt = await UserModel.count({where: {
+            [Op.and]: [
+                { email: guest_email },
+                { is_deleted: 0 }
+        ]}});
     
+        if (cnt > 0) {
+            return "Already you have an account";
+
+        }else{
+            let guest_first_name = info[0].first_name;
+            let guest_last_name = info[0].last_name;
+            let guest_password = info[0].password;
+            
     
+            let result = new User();
+            await result.addUser(guest_first_name, guest_last_name,guest_email,guest_password);
+            return true;
+         
+        }
+            
+    }
+   
 }
 
 user1=new User();
@@ -367,5 +308,6 @@ user1=new User();
 
 //user1.deleteAccount().then(result => console.log('Account Deleted: ', result));
 //user1.changePassword("543","123").then(result => console.log('Password Changed: ', result));;
-//user1.addUser("Chamara", "Weerasinghe","chamara@gmail.com","123");
+//user1.addUser("Chamara", "Weerasinghe","chamara@gmail.com","kk");
 // viewEvent(1).then(result=>console.log("Event Details: ",result));
+//user1.createAccount([{first_name: "Lahiru" ,last_name: "Madhushan", email:'lahiru@gmail.com', password:'abc'}]).then(result => console.log('Account Creation: ', result));
