@@ -5,6 +5,7 @@ CREATE TABLE `User` (
   `email` varchar(100) NOT NULL,
   `password` char(32) NOT NULL,
   `profile_pic` varchar(150),
+  `is_deleted` tinyint(1) NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`)
 );
 
@@ -41,10 +42,10 @@ CREATE TABLE `Event` (
 );
 
 CREATE TABLE `Skill` (
-  `id` int NOT NULL,
+  `id` int NOT NULL AUTO_INCREMENT,
   `user_id` int NOT NULL,
   `name` varchar(150) NOT NULL,
-  `validations` int unsigned,
+  `validations` int unsigned DEFAULT 0,
   PRIMARY KEY (`id`),
   CONSTRAINT UC_UserSkill UNIQUE(`user_id`, `name`),
   CONSTRAINT FK_UserSkill FOREIGN KEY (user_id) 

@@ -21,7 +21,8 @@ const UserModel=sequelize.define('User',{
         allowNull: false
     },
     password: DataTypes.STRING,
-    profile_pic: DataTypes.STRING
+    profile_pic: DataTypes.STRING,
+    is_deleted: DataTypes.BOOLEAN
 },{
     sequelize,
     modelName:'User',
