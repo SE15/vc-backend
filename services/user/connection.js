@@ -10,7 +10,7 @@ class Connection {
         
     }
 
-     async saveToDatabase(isNew, t = null){
+    async saveToDatabase(isNew, t = null){
         //adding a new connection to the database
         
         if (isNew == true) { 
@@ -69,13 +69,15 @@ class Connection {
         let cnt1 = await ConnectionModel.count({where: {
             [Op.and]: [
                 { recipient_id: recipient_id },
-                { requester_id: reque_id }
+                { requester_id: reque_id },
+                { state:'pending'}
             ] 
         }})
         let cnt2 = await ConnectionModel.count({where: {
             [Op.and]: [
                 { requester_id: recipient_id },
-                { recipient_id: reque_id }
+                { recipient_id: reque_id },
+                { state:'pending'}
             ] 
         }})
         

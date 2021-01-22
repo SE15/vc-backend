@@ -48,7 +48,7 @@ class User{
         const user=UserModel.findAll({
             attributes:['first_name','last_name','profile_pic'], raw: true,
             where:{
-                [Op.or]:[{first_name: `${name}`},{last_name: `${name}`}]
+                [Op.or]:[{first_name: `${name}`,is_deleted:0},{last_name: `${name}`, is_deleted:0}]
                     
             }
         });
@@ -195,21 +195,25 @@ class User{
     async addConnection(recipient_id) {
         //temp data
         
-        this.requester_id = 2;
+        this.requester_id = 6;
         let reque_id=this.requester_id;
         let checkin=null;
             
         checkin = await Connection.checkValidations(recipient_id,reque_id);
-          
-           
+                  
+        try{   
         if(checkin===true){
                     
             let connection = new Connection({requester_id: this.requester_id, recipient_id: recipient_id});
             return await connection.saveToDatabase(true);
+            
             //return connection;
        
         }else{
             return "Already exists";
+        }
+        }catch(e){
+            return "Something went wrong";
         }
     }
 
@@ -344,6 +348,7 @@ user1=new User();
 //user1.deleteAccount().then(result => console.log('Account Deleted: ', result));
 //user1.changePassword("543","123").then(result => console.log('Password Changed: ', result));;
 //user1.addUser("Chamara", "Weerasinghe","chamara@gmail.com","kk");
-// viewEvent(1).then(result=>console.log("Event Details: ",result));
+//user1.viewEvent(1).then(result=>console.log("Event Details: ",result));
+//user1.viewEvent(1).then(result=>console.log("Event Details: ",result));
 
-//user1.removeSkill(33).then(result=>console.log("Event Details: ",result));
+//user1.searchUser("Lahiru").then(result=>console.log("Search Details: ",result));

@@ -55,15 +55,16 @@ class Guest{
    
 
     async searchUser(name){
-      
+    
         const user=UserModel.findAll({
             attributes:['first_name','last_name','profile_pic'], raw: true,
             where:{
-                [Op.or]:[{first_name: `${name}`},{last_name: `${name}`}]
-            
+                [Op.or]:[{first_name: `${name}`,is_deleted:0},{last_name: `${name}`, is_deleted:0}]
+                    
             }
         });
         return user;
+    
     } 
 
     async viewProfile(user_id){
@@ -102,5 +103,5 @@ class Guest{
 
 }
 guest1 = new Guest();
-//guest1.searchUser("Ridmi").then(result => console.log('Connection Added: ', result));
+//guest1.searchUser("Lahiru").then(result => console.log('Connection Added: ', result));
 //guest1.createAccount([{first_name: "Lahiru" ,last_name: "Madhushan", email:'lahiru1@gmail.com', password:'abc'}]).then(result => console.log('Account Creation: ', result));
