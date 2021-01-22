@@ -89,9 +89,9 @@ class Connection {
             }
         } else {
             if(cnt1!=0){
-                throw new Error('You have already sent a request');
+                return false;
             }else{
-                throw new Error('You already got a request');
+                return false;
             }
 
                 
@@ -109,6 +109,7 @@ class Connection {
                             { requester_id: reque_id },
                             { recipient_id: recipient_id }
                         ]}, transaction : t});
+                        return true;
             
             }
 
@@ -121,9 +122,10 @@ class Connection {
                             { requester_id: reque_id },
                             { recipient_id: recipient_id }
                         ]}, transaction : t});
+                return false;
                        
             }   
-        return true; 
+         
         
         
         }

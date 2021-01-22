@@ -57,10 +57,10 @@ class Skill {
                     throw err;
                 }
             } else {
-                throw new Error('You have already validated this skill');
+                return "validated";
             }
         } else {
-            throw new Error('You cannot validate your own skill');
+            return 'You cannot validate your own skill';
         }
     }
 
@@ -70,8 +70,14 @@ class Skill {
      * @return boolean - true if successfully deleted
      */
     async destroy() {
-        await SkillModel.destroy({where: {id: this.id}});
-        return true;
+        let deleteSkill=await SkillModel.destroy({where: {id: this.id}});
+
+        if(deleteSkill==true){
+            return true;
+        }else{
+            return false;
+        }
+        
     }
     
     /**

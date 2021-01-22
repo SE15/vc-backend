@@ -3,7 +3,7 @@ const bcrypt = require("bcrypt");
 const UserModel=require('../models/user-model');
 const SkillModel=require('../models/skill-model');
 const ConnectionModel=require('../models/connection-model');
-const ReccomendationModel=require('../models/recommendation-model');
+const RecommendationModel=require('../models/recommendation-model');
 const sequelize=require('../config/database');
 const { raw } = require('express');
 const { or } = require('sequelize');
@@ -23,24 +23,14 @@ class User{
         }
     }
 
-    static async create(id) {
+    static async createUser(id) {
         //gets the information from the database
         let userInfo = await UserModel.findOne({where: {id: id}});
         return new User(userInfo);
     }
 
 
-    async addUser(first_name,last_name,email,password){
-
-        let hashPassword = md5(password);
-        const newUser= await UserModel.create({
-            first_name: `${first_name}`,
-            last_name:`${last_name}`,
-            email: `${email}`,
-            password: `${hashPassword}`,
-     
-    });
-    }
+    
 
     async getAllUsers(){
       
@@ -69,8 +59,8 @@ class User{
     async deleteAccount(){
 
         //temp data
-        this.user_id = 22;
-        await UserModel.update({ 
+        this.user_id = 18;
+        let deleteUser=await UserModel.update({ 
                     
             is_deleted: 1},{
                 where: {
@@ -79,7 +69,15 @@ class User{
                     {is_deleted:0}
                     ]     
         }});
-        return true;        
+
+        console.log(typeof(deleteUser));
+
+        if (deleteUser==true){
+            return true;   
+        }else{
+            return false;
+        }
+             
     }
 
     async changePassword(oldPassword,newPassword){
@@ -102,7 +100,7 @@ class User{
             return true;        
 
         }else{
-            console.log('Password does not match');
+            //console.log('Password does not match');
             return false;
         }
     
@@ -115,7 +113,7 @@ class User{
         var last_name=details[0].last_name;
         var profile_pic=details[0].profile_pic;
         if (first_name==undefined && last_name==undefined && profile_pic==undefined){
-             return "You didn't made any changes";
+             return false;
         
         }else if(first_name!=undefined && last_name==undefined && profile_pic!=undefined){
             await UserModel.update({ 
@@ -125,7 +123,7 @@ class User{
                     id:user_id
                 }
               })
-            return "successfully Update Details";
+            return true;
 
         }else if(first_name!=undefined && last_name!=undefined && profile_pic==undefined){
             await UserModel.update({ 
@@ -135,7 +133,7 @@ class User{
                     id:user_id
                 }
               })
-            return "successfully Update Details";
+            return true;
 
         }else if(first_name==undefined && last_name!=undefined && profile_pic!=undefined){
             await UserModel.update({  
@@ -145,7 +143,7 @@ class User{
                     id:user_id
                 }
               })
-            return "successfully Update Details";
+            return true;
 
         }else if(first_name==undefined && last_name==undefined && profile_pic!=undefined){
             await UserModel.update({ 
@@ -154,7 +152,7 @@ class User{
                     id:user_id
                 }
               })
-            return "successfully Update Details";
+            return true;
 
         }else if(first_name==undefined && last_name==undefined && profile_pic!=undefined){
             await UserModel.update({  
@@ -163,7 +161,7 @@ class User{
                     id:user_id
                 }
               })
-            return "successfully Update Details";
+            return true;
 
         }else if(first_name==undefined && last_name!=undefined && profile_pic!=undefined){
             await UserModel.update({ 
@@ -172,7 +170,7 @@ class User{
                     id:user_id
                 }
               })
-            return "successfully Update Details";
+            return true;
             
         }
         }
@@ -258,7 +256,8 @@ class User{
 
     async removeSkill(id) {
         //temp data
-        this.user_id = 1;
+        //this.user_id = 1;
+        id=`${id}`
     
         let skill = await Skill.create(id);
         return await skill.destroy();
@@ -294,26 +293,26 @@ class User{
     }
 
     async viewProfile(user_id){
-        user_id:user_id;
        
         const user=await UserModel.findAll({
             attributes:['first_name','last_name','profile_pic'], raw: true,
-            where:{
-                id:user_id
+            where:{[Op.and]:
+                [{id:`${user_id}`,is_deleted:0}]
                     
             }
     
             });
+       
         const records= await RecommendationModel.findAll({
             attributes:['Recommended_by','description'], raw: true,
             where:
-                [{user_id:user_id}]
+                [{user_id:`${user_id}`}]
         });
     
         const skills=await SkillModel.findAll({
             attributes:['name','validations'], raw: true,
             where:
-                [{user_id:user_id}]
+                [{user_id:`${user_id}`}]
         })
         //return records;
         //return user;
@@ -326,32 +325,7 @@ class User{
     }
 
 
-    async  createAccount(info) {
-        //check if the user had already created an account 
-        let guest_email = info[0].email;
-        let cnt = await UserModel.count({where: {
-            [Op.and]: [
-                { email: guest_email },
-                { is_deleted: 0 }
-        ]}});
     
-        if (cnt > 0) {
-            return "Already you have an account";
-
-        }else{
-            let guest_first_name = info[0].first_name;
-            let guest_last_name = info[0].last_name;
-            let guest_password = info[0].password;
-            
-    
-            let result = new User();
-            await result.addUser(guest_first_name, guest_last_name,guest_email,guest_password);
-            return true;
-         
-        }
-            
-    }
-   
 }
 
 user1=new User();
@@ -371,4 +345,5 @@ user1=new User();
 //user1.changePassword("543","123").then(result => console.log('Password Changed: ', result));;
 //user1.addUser("Chamara", "Weerasinghe","chamara@gmail.com","kk");
 // viewEvent(1).then(result=>console.log("Event Details: ",result));
-//user1.createAccount([{first_name: "Lahiru" ,last_name: "Madhushan", email:'lahiru@gmail.com', password:'abc'}]).then(result => console.log('Account Creation: ', result));
+
+//user1.removeSkill(33).then(result=>console.log("Event Details: ",result));
