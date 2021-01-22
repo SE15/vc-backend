@@ -25,6 +25,19 @@ class Guest{
         return user;
     } 
 
+    async viewProfile(user_id){
+        user_id:user_id;
+       
+        const user=await UserModel.findAll({
+            attributes:['first_name','last_name','profile_pic'], raw: true,
+            where:{
+                id:user_id
+                    
+            }
+    
+        });
+    }
+
 }
 //guest1 = new Guest();
 //guest1.searchUser("Ridmi").then(result => console.log('Connection Added: ', result));
