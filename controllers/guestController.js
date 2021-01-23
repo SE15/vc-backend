@@ -1,7 +1,7 @@
-const User = require('../../services/user.js');
+const User = require('../services/user.js');
 
 // Instantiate User:
-let guest = new Guest();
+//let guest = new Guest();
 
 const guestController  = {};
 

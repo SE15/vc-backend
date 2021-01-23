@@ -227,16 +227,25 @@ class User{
         
     }
 
-    async  respondConnection(recipient_id,accept){
+    async  respondConnection(requester_id,accept){
 
-        this.requester_id = 2;
-        let reque_id=this.requester_id;
+        this.recipient_id = 11;
+        let recipi_id=this.recipient_id;
         let res = null;
     
-        
-        res = await Connection.updateState(recipient_id,reque_id,accept);
-        return res;
-    
+        let cnt2 = await ConnectionModel.count({where: {
+            [Op.and]: [
+                { requester_id: requester_id },
+                { recipient_id: recipi_id },
+                { state:'pending'}
+            ] 
+        }})
+        if(cnt2 > 0){
+            res = await Connection.updateState(recipi_id,requester_id,accept);
+            return res;
+        }else{
+            return "removed one/ accepted one";
+        }
     }
 
     async validateSkill(id) {

@@ -1,4 +1,4 @@
-const User = require('../services/user');
+const User = require('../services/user.js');
 
 // Instantiate User:
 let user = new User();
@@ -8,10 +8,11 @@ const userController  = {};
 //user functions
 userController.searchUser = async (req, res, next) => {
     try {
-        const keyword = req.query.keyword; 
-        console.log(keyword);
-
-        const users = await user.searchUser(keyword);  
+        const keyword = req.query.keyword;    
+         const users = await user.searchUser(keyword);
+         
+        
+         
         
         
         /**const users = await user.searchUsers(keyword);
@@ -61,8 +62,7 @@ userController.viewProfile = async (req, res, next) => {
 userController.deleteAccount = async (req, res, next) => {
     try {
         const responce = await user.deleteAccount();
-        console.log(responce);
-
+        
         if(responce === true){
             return res.json({ msg: "User successfully deleted" });
         }else{
@@ -76,17 +76,15 @@ userController.deleteAccount = async (req, res, next) => {
          */
         
     } catch (err) {
-        //console.log(error);
       next(err);
     }
   };
 
 userController.addSkill = async (req, res, next) => {
     try {
-        const name = req.body.name; 
-        console.log(name);   
-        const responce = await user.addSkill(name);
-        console.log(responce);
+        const name = req.body.name;
+           
+        const responce = await User.addSkill(name);
 
         if(responce === true){
             return res.json({ msg: "Successfully added the skill" });
@@ -189,6 +187,7 @@ userController.respondConnection = async (req, res, next) => {
     try {
         const connectionID = req.params.id;
         const accept = req.body.accept;
+        console.log(accept);
         const responce = await user.respondConnection(connectionID,accept);
 
         if(responce === true){
@@ -266,6 +265,7 @@ userController.changePassword = async (req, res, next) => {
     try {
         const oldPass = req.body.oldPass;
         const newPass = req.body.newPass;
+        
         const responce = await user.changePassword(oldPass, newPass);
 
         // what is the exception

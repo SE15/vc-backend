@@ -101,15 +101,15 @@ class Connection {
         
     }
 
-    static async updateState(recipient_id,reque_id,accept,t=null){
+    static async updateState(recipi_id,requester_id,accept,t=null){
         if(accept===true){
                 await ConnectionModel.update({ 
                     
                     state: "accepted"},{
                     where: {
                         [Op.and]: [
-                            { requester_id: reque_id },
-                            { recipient_id: recipient_id }
+                            { requester_id: requester_id },
+                            { recipient_id: recipi_id }
                         ]}, transaction : t});
                         return true;
             
@@ -121,8 +121,8 @@ class Connection {
                     state: "rejected"},{
                     where: {
                         [Op.and]: [
-                            { requester_id: reque_id },
-                            { recipient_id: recipient_id }
+                            { requester_id: requester_id },
+                            { recipient_id: recipi_id }
                         ]}, transaction : t});
                 return false;
                        
