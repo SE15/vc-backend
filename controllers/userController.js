@@ -1,9 +1,7 @@
-const User = require('./user.js');
-
-//const User = require('..services/user.js');
+//const User = require('../services/user.js');
 
 // Instantiate User:
-let user = new User();
+//let user = new User();
 
 const userController  = {};
 
@@ -35,7 +33,6 @@ userController.searchUsers = async (req, res, next) => {
         }else{
             return res.json({msg: "No result found"});
         }
-        //res.end('<html><body><p><%=users></p></body></html>');
         
     } catch (err) {
       next(err);
@@ -54,7 +51,6 @@ userController.viewProfile = async (req, res, next) => {
          * error exception
          */
 
-        //res.end('<html><body><p><%=users></p></body></html>');
         
     } catch (err) {
       next(err);
@@ -76,8 +72,6 @@ userController.deleteAccount = async (req, res, next) => {
          * "User successfully deleted"
          * error exception
          */
-
-        //res.end('<html><body><p><%=users></p></body></html>');
         
     } catch (err) {
       next(err);
@@ -104,7 +98,7 @@ userController.addSkill = async (req, res, next) => {
          * "This skill has already added"
          */
 
-        //res.end('<html><body><p><%=users></p></body></html>');
+        
         
     } catch (err) {
       next(err);
@@ -128,7 +122,6 @@ userController.removeSkill = async (req, res, next) => {
          * error exception
          */
 
-        //res.end('<html><body><p><%=users></p></body></html>');
         
     } catch (err) {
       next(err);
@@ -155,7 +148,6 @@ userController.validateSkill = async (req, res, next) => {
          * "You have already validated the skill"
          */
 
-        //res.end('<html><body><p><%=users></p></body></html>');
         
     } catch (err) {
       next(err);
@@ -182,7 +174,6 @@ userController.addConnection = async (req, res, next) => {
          * ?? "Request already sent" 
          */
 
-        //res.end('<html><body><p><%=users></p></body></html>');
         
     } catch (err) {
       next(err);
@@ -211,7 +202,6 @@ userController.respondConnection = async (req, res, next) => {
          * error exception
          */
 
-        //res.end('<html><body><p><%=users></p></body></html>');
         
     } catch (err) {
       next(err);
@@ -236,7 +226,6 @@ userController.removeConnection = async (req, res, next) => {
          * "Failed to remove connection" in sequence
          */
 
-        //res.end('<html><body><p><%=users></p></body></html>');
         
     } catch (err) {
       next(err);
@@ -262,7 +251,6 @@ userController.submitRecommendation = async (req, res, next) => {
          * "Unable to submit" in sequence
          */
 
-        //res.end('<html><body><p><%=users></p></body></html>');
         
     } catch (err) {
       next(err);
@@ -289,8 +277,6 @@ userController.changePassword = async (req, res, next) => {
          * exception => validate oldPass => compare newPass and oldPass
          * 
          */
-
-        //res.end('<html><body><p><%=users></p></body></html>');
         
     } catch (err) {
       next(err);
@@ -316,7 +302,6 @@ userController.editProfile = async (req, res, next) => {
          * error exception => information validate
          */
 
-        //res.end('<html><body><p><%=users></p></body></html>');
         
     } catch (err) {
       next(err);

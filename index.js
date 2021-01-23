@@ -1,6 +1,7 @@
 require('dotenv').config()
 const express = require('express'),
     http = require('http');
+const HttpStatus = require('http-status');
 const bodyParser = require('body-parser');
 
 const hostname = 'localhost';
@@ -22,7 +23,7 @@ server.listen(port, hostname, () => {
 });
 
 //user Routes
-const userseRoutes = require('./routes/api/users');
+const usersRoutes = require('./routes/api/users');
 app.use('/api', usersRoutes);
 
 //guest Routes
@@ -32,7 +33,8 @@ app.use('/api/guests', guestsRoutes);
 // catch 404 and forward to error handler
 app.use((req, res, next) => {
     const err = new Error('Not Found');
-    err.status = 404;
+    err.status = HttpStatus.NOT_FOUND;
+    err.log = "not found";
     next(err);
   });
   
@@ -40,7 +42,7 @@ app.use((req, res, next) => {
   // no stacktraces leaked to user unless in development environment
   app.use((err, req, res, next) => {
     if (err.status === 404) {
-        return res.json({msg: err});
+        return res.status(404).json({msg: err});
     } else {
         return res.json({msg: err});
     }

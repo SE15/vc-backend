@@ -1,9 +1,7 @@
-const Guest = require('./guest.js');
-
-//const User = require('..services/user.js');
+///const User = require('../services/user.js');
 
 // Instantiate User:
-let users = new Users();
+//let users = new Users();
 
 const guestController  = {};
 
@@ -35,7 +33,7 @@ guestController.searchUsers = async (req, res, next) => {
         }else{
             return res.json({msg: "No result found"});
         }
-        //res.end('<html><body><p><%=users></p></body></html>');
+        
         
     } catch (err) {
       next(err);
@@ -54,7 +52,7 @@ guestController.viewProfile = async (req, res, next) => {
          * error exception
          */
 
-        //res.end('<html><body><p><%=users></p></body></html>');
+        
         
     } catch (err) {
       next(err);
@@ -80,7 +78,7 @@ guestController.createAccount = async (req, res, next) => {
          * error exception
          */
 
-        //res.end('<html><body><p><%=users></p></body></html>');
+        
 /*
         //simple validation 
         if(!name || !email || !password){
