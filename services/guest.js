@@ -2,7 +2,8 @@ const sequelize=require('../config/database');
 const UserModel=require('../models/user-model');
 const {Op} = require("sequelize");
 const md5 = require('md5');
-
+const RecommendationModel = require('../models/recommendation-model');
+const SkillModel = require('../models/skill-model');
 
 class Guest{
     
@@ -102,6 +103,9 @@ class Guest{
     }
 
 }
-guest1 = new Guest();
+
+module.exports=Guest;
+//guest1 = new Guest();
 //guest1.searchUser("Lahiru").then(result => console.log('Connection Added: ', result));
 //guest1.createAccount([{first_name: "Lahiru" ,last_name: "Madhushan", email:'lahiru1@gmail.com', password:'abc'}]).then(result => console.log('Account Creation: ', result));
+//guest1.viewProfile(2).then(result => console.log('Profile Status: ', result));

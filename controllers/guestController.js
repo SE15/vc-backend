@@ -1,14 +1,14 @@
-const User = require('../services/user.js');
+const Guest = require('../services/guest.js');
 
 // Instantiate User:
-//let guest = new Guest();
+let guest = new Guest();
 
 const guestController  = {};
 
 //guest functions
 guestController.searchUser = async (req, res, next) => {
     try {
-        const keyword = req.params.keyword; 
+        const keyword = req.query.keyword; 
 
         const users = await guest.searchUser(keyword);  
         
@@ -42,7 +42,8 @@ guestController.searchUser = async (req, res, next) => {
 
 guestController.viewProfile = async (req, res, next) => {
     try {
-        const userID = req.params.id;    
+        const userID = req.params.id;
+            
         const profile = await guest.viewProfile(userID);
         
         return res.json(profile);
