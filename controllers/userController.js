@@ -187,7 +187,7 @@ userController.respondConnection = async (req, res, next) => {
     try {
         const connectionID = req.params.id;
         const accept = req.body.accept;
-        console.log(accept);
+        
         const responce = await user.respondConnection(connectionID,accept);
 
         if(responce === true){
