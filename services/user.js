@@ -17,9 +17,9 @@ class User{
     constructor(){
         try {
             sequelize.authenticate();
-            console.log('Connection has been established successfully.');
+            //console.log('Connection has been established successfully.');
         } catch (error) {
-            console.error('Unable to connect to the database:', error);
+            //console.error('Unable to connect to the database:', error);
         }
     }
 
@@ -59,8 +59,8 @@ class User{
     async deleteAccount(){
 
         //temp data
-        this.user_id = 18;
-        let deleteUser=await UserModel.update({ 
+        this.user_id = 1;
+        let deleteUser = await UserModel.update({ 
                     
             is_deleted: 1},{
                 where: {
@@ -70,9 +70,9 @@ class User{
                     ]     
         }});
 
-        console.log(typeof(deleteUser));
+        //console.log(deleteUser);
 
-        if (deleteUser==true){
+        if (deleteUser==1){
             return true;   
         }else{
             return false;
@@ -82,7 +82,7 @@ class User{
 
     async changePassword(oldPassword,newPassword){
         //temp data
-        this.user_id=16;
+        this.user_id=30;
         
         let result = await UserModel.findOne({where: {id: this.user_id}});
         let hashPassword = result.password;
@@ -108,7 +108,7 @@ class User{
 
      //method for all the attributes not passes when editing profile 
      async editProfile(details){
-        let user_id=2;
+        let user_id=30;
         var first_name=details[0].first_name;
         var last_name=details[0].last_name;
         var profile_pic=details[0].profile_pic;
@@ -241,7 +241,7 @@ class User{
 
     async validateSkill(id) {
         //temp values
-        this.user_id = 10;
+        this.user_id = 1;
 
         let skill = await Skill.create(id);
         return await skill.incrementValidations(this.user_id);
@@ -250,10 +250,15 @@ class User{
 
     async addSkill(name) {
         //temp data
-        this.user_id = 2;
     
+        this.user_id = 1;
         let skill = new Skill({user_id: this.user_id, name: name});
-        return await skill.saveToDatabase(true);
+        let addSkill= await skill.saveToDatabase(true);
+        if(addSkill==true){
+            return true;
+        }else{
+            return false;
+        }
         //return skill;
         
     }
@@ -270,7 +275,7 @@ class User{
 
     async submitRecommendation(user_id,description) {
         //temp data
-        this.recommended_by = 11;
+        this.recommended_by = 1;
         let recommended_by= this.recommended_by
         let check_validation=null;
     
@@ -329,16 +334,17 @@ class User{
     }
 
 
+
     
 }
-
-user1=new User();
+module.exports = User;
+//user1=new User();
 //user1.addConnection(11).then(result => console.log('Connection Added: ', result));
 //user1.removeConnection(11).then(result => console.log('Connection Removed: ', result));
 //user1.respondConnection(10,false).then(result => console.log('Connection state updated: ', result));
 
 //user1.validateSkill(4).then(result => console.log('Skill Validated:', result));
-//user1.addSkill('node hh').then(result => console.log('Skill Added: ', result));
+//user1.addSkill('mysql skills11').then(result => console.log('Skill Added: ', result));
 //user1.removeSkill(60).then(result => console.log('Skill Removed: ', result));
 
 //user1.submitRecommendation(1,'recommnded').then(result => console.log('Recommendation Added: ', result));
@@ -346,8 +352,8 @@ user1=new User();
 //user1.viewProfile(1).then(result=>console.log('Profile: ', result));
 
 //user1.deleteAccount().then(result => console.log('Account Deleted: ', result));
-//user1.changePassword("543","123").then(result => console.log('Password Changed: ', result));;
-//user1.addUser("Chamara", "Weerasinghe","chamara@gmail.com","kk");
+//user1.changePassword("123","456").then(result => console.log('Password Changed: ', result));;
+//user1.addUser("kamar", "sangakkara","sanga@gmail.com","123");
 //user1.viewEvent(1).then(result=>console.log("Event Details: ",result));
 //user1.viewEvent(1).then(result=>console.log("Event Details: ",result));
 
