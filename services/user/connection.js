@@ -16,7 +16,8 @@ class Connection {
         if (isNew == true) { 
             await ConnectionModel.create({ 
                 requester_id: this.requester_id,
-                recipient_id: this.recipient_id}, { transaction: t });
+                recipient_id: this.recipient_id,
+                state:"pending"}, { transaction: t });
             let result = await ConnectionModel.findOne({where: {
                 [Op.and]: [
                     { requester_id: this.requester_id },

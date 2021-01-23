@@ -210,7 +210,7 @@ class User{
             //return connection;
        
         }else{
-            return "Already exists";
+            return "sent";
         }
         }catch(e){
             return "Something went wrong";

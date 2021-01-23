@@ -24,7 +24,7 @@ CREATE TABLE `Connection` (
   `requester_id` int NOT NULL,
   `recipient_id` int NOT NULL,
   `state` enum('pending','accepted','rejected') NOT NULL DEFAULT 'pending',
-  PRIMARY KEY (`requester_id`, `recipient_id`),
+  PRIMARY KEY (`requester_id`, `recipient_id`,`state`),
   CONSTRAINT FK_RequesterUser FOREIGN KEY (requester_id) 
   REFERENCES User(id) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT FK_RecipientUser FOREIGN KEY (recipient_id) 

@@ -26,7 +26,11 @@ const ConnectionModel=sequelize.define('Connection',{
 
         }
     },
-    state:DataTypes.ENUM('pending', 'accepted', 'rejected')	
+    state:{
+        type:DataTypes.ENUM('pending', 'accepted', 'rejected'),
+        primaryKey:true,
+        allowNull: false	
+    }	
 },{
     sequelize,
     timestamps: false,

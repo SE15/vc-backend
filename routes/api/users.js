@@ -10,7 +10,7 @@ router.get('/users/:id', authorization, userController.viewProfile);
 router.post('/users/skills/add', authorization, userController.addSkill);
 router.delete('/users/skills/:id', authorization, userController.removeSkill);
 router.put('/users/skills/:id', authorization, userController.validateSkill);
-router.post('/users/connections/add/:id', authorization, userController.addConnection);
+router.post('/users/connections/add/:id', userController.addConnection);
 router.put('/users/connections/respond/:id',authorization, userController.respondConnection);
 router.delete('/users/connections/:id', authorization, userController.removeConnection);
 router.post('/users/recommendations/:id', authorization, userController.submitRecommendation);
