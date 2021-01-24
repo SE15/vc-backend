@@ -170,6 +170,117 @@ class Guest{
         return profile;
     }
 
+    async getUser(email){
+
+        const login_id = await UserModel.findOne({
+            arrtibute:["id"],
+            where:{
+                email:email
+            },raw:true
+        });
+
+
+        let user_id= login_id.id;
+       
+        const user=await UserModel.findAll({
+            attributes:['first_name','last_name','profile_pic'], raw: true,
+            where:{[Op.and]:
+                [{id:user_id,is_deleted:0}]
+                    
+            }
+    
+            });
+       
+        const records= await RecommendationModel.findAll({
+            attributes:['Recommended_by','description'], raw: true,
+            where:
+                [{user_id:user_id}]
+        });
+        var recommendations=[]
+        for (const i in records){
+            let recommended_by= records[i].Recommended_by;
+            let description=records[i].description;
+
+            let recommended_name=await UserModel.findOne({
+            attributes:["first_name","last_name"],
+            where:{id:recommended_by},raw:true
+            });
+
+            recommended_name.description=description;
+            recommendations.push(recommended_name);
+
+        }
+    
+        const skills=await SkillModel.findAll({
+            attributes:['name','validations'], raw: true,
+            where:
+                [{user_id:user_id}]
+        });
+
+        var profile=[];
+        profile.push(user);
+        profile.push(skills);
+        profile.push(recommendations);
+
+        let connections1 = await ConnectionModel.findAll({
+            attributes:["requester_id"],
+            where:{[Op.and]:[{
+                recipient_id:user_id
+            },{state:"accepted"}]
+        },raw:true});
+
+        let connections2 = await ConnectionModel.findAll({
+            attributes:["recipient_id"],
+            where:{[Op.and]:[{
+                requester_id:user_id
+            },{state:"accepted"}]
+        },raw:true});
+
+        var names=[];
+
+        for (const x in connections1){
+            let con_id=connections1[x].requester_id;
+           // console.log(con_id);
+            
+            let name=await UserModel.findOne({
+                attributes:["first_name","last_name"],
+                where:{
+                    id:con_id
+                },raw:true
+            });
+            //Object.assign({},name);
+
+            names.push(name);
+
+        }
+
+        for (const y in connections2){
+            let con_id=connections2[y].recipient_id;
+           // console.log(con_id);
+            
+            let name=await UserModel.findOne({
+                attributes:["first_name","last_name"],
+                where:{
+                    id:con_id
+                },raw:true
+            });
+            //console.log(name);
+            //Object.assign({},name);
+            names.push(name);
+
+        }
+
+        
+        profile.push(names);
+
+        //console.log(connections);
+        //return records;
+        //return user;
+        //return mergeduser;
+        return profile;
+    }
+
+
 }
 
 module.exports=Guest;
