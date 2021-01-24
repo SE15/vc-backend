@@ -1,7 +1,10 @@
-const Guest = require('../services/guest.js');
+const User = require('../services/user.js');
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
+const config = require('config');
 
 // Instantiate User:
-let guest = new Guest();
+//let guest = new Guest();
 
 const guestController  = {};
 
@@ -11,27 +14,21 @@ guestController.searchUser = async (req, res, next) => {
         const keyword = req.query.keyword; 
 
         const users = await guest.searchUser(keyword);  
-        
-        
-        /**const users = await user.searchUsers(keyword);
-         * if users.length
-         *      convert users array into json
-         *      send json
-         * else 
-         *      "No result found"
-         * **assume above users is the json object
-        */
-        
-        /**
-         * success 
-         *      array[user(name,profpic)]
-         * error empty array[]
-         *      "No result found"
-         */
+
         if(users.length){
-            return res.json(users);
+            const response = {
+                err: 0,
+                obj: users,
+                msg: ""
+              }
+              return res.json(response);
         }else{
-            return res.json({msg: "No result found"});
+            const response = {
+                err: 1,
+                obj: {},
+                msg: "No result found"
+              }
+              return res.json(response);
         }
         
         
@@ -42,19 +39,15 @@ guestController.searchUser = async (req, res, next) => {
 
 guestController.viewProfile = async (req, res, next) => {
     try {
-        const userID = req.params.id;
-            
+        const userID = req.params.id;    
         const profile = await guest.viewProfile(userID);
-        
-        return res.json(profile);
 
-        /**
-         * success "id, name, profile, skills : {id, name}"	
-         * error exception
-         */
-
-        
-        
+        const response = {
+            err: 0,
+            obj: profile,
+            msg: ""
+          }
+          return res.json(response);        
     } catch (err) {
       next(err);
     }
@@ -67,66 +60,71 @@ guestController.createAccount = async (req, res, next) => {
         const response = await guest.createAccount(information);
 
         if(response === true){
-            return res.json({ msg: "User successfully registered" });
+            const response = {
+                err: 0,
+                obj: true,
+                msg: "User successfully registered"
+              }
+              return res.json(response);
         }else if(response === false){
-            return res.json({ msg: "User already exists" });
+            const response = {
+                err: 0,
+                obj: false,
+                msg: "User already exists"
+              }
+              return res.json(response);
         }else{
-            return res.json({ msg: "Something is wrong" });
+            const response = {
+                err: 0,
+                obj: {},
+                msg: "Something is wrong"
+              }
+              return res.json(response);
         }
 
-        /**
-         * success array[name,location,start_date,end_date,status]	
-         * error exception
-         */
-
-        
-/*
-        //simple validation 
-        if(!name || !email || !password){
-            return res.status(400).json({ msg: 'Please enter all fields.'});
-        }
-        //check for existing user
-        User.findOne({ email})
-            .then(user =>{
-                if(user) return res.status(400).json({ msg: 'User already exists'});
-                
-                const newUser = new User({
-                    name,
-                    email,
-                    password
-                });
-                //create salt & hash
-                bcrypt.genSalt(10, (err, salt) => {
-                    bcrypt.hash(newUser.password, salt, (err, hash) => {
-                        if(err) throw err;
-                        newUser.password = hash;
-                        newUser.save()
-                            .then(user => {
-                                jwt.sign(
-                                    {id: user.id},
-                                    config.get('jwtSecret'),
-                                    { expiresIn: 3600 },
-                                    (err, token) => {
-                                        if(err) throw err;
-                                        return res.json({
-                                            token,
-                                            user: {
-                                                id: user.id,
-                                                name: user.name,
-                                                email: user.email
-                                            }
-                                        });
-                                    }
-                                )
-                            });
-                    })
-                });
-*/
     } catch (err) {
       next(err);
     }
   };
 
+  guestController.login = (req, res, next) => {
+    try {
+        const email = req.query.email; 
+        const password = req.query.password; 
+
+        const user = guest.getUser(email);
+
+        //validate password
+        bcrypt.compare(password, user.password)
+        .then(isMatch => {
+            if(!isMatch){
+                const response = {
+                    err: 1,
+                    obj: {},
+                    msg: "Invalid password"
+                  }
+                  return res.json(response);
+            }
+            
+            jwt.sign(
+                {id: user.id},
+                config.get('jwtSecret'),
+                { expiresIn: 3600 },
+                (err, token) => {
+                    if(err) throw err;
+                    return res.json({
+                        token,
+                        user: user
+                    });
+                }
+            )
+        });
+
+      
+    } catch (err) {
+      next(err);
+    }
+  };
 
 
 module.exports = guestController;
