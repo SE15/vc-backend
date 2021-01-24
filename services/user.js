@@ -69,10 +69,21 @@ class User{
                     {is_deleted:0}
                     ]     
         }});
+        let deleteSkills=await SkillModel.destroy({
+            where:{
+                user_id:this.user_id
+            }
+        });
 
-        //console.log(deleteUser);
+        let deleteRecommendations=await RecommendationModel.destroy({
+            where:{
+                user_id:this.user_id,
+            }
+        });
 
-        if (deleteUser==1){
+        console.log(deleteSkills,deleteRecommendations);
+
+        if (deleteUser==1 && deleteSkills!=null && deleteRecommendations!=null){
             return true;   
         }else{
             return false;
@@ -108,29 +119,40 @@ class User{
 
      //method for all the attributes not passes when editing profile 
      async editProfile(details){
-        let user_id=30;
+        this.user_id=30;
         var first_name=details[0].first_name;
         var last_name=details[0].last_name;
         var profile_pic=details[0].profile_pic;
         if (first_name==undefined && last_name==undefined && profile_pic==undefined){
              return false;
         
-        }else if(first_name!=undefined && last_name==undefined && profile_pic!=undefined){
+        }else if(first_name!=undefined && last_name!=undefined && profile_pic!=undefined){
             await UserModel.update({ 
-                first_name:frist_name , 
-                profile_pic:profile_pic}, {
+                first_name:first_name,
+                last_name:last_name,
+                profile_pic:profile_pic
+            }, {
                 where: {
-                    id:user_id
+                    id:this.user_id
                 }
               })
+            return true;
+            
+        }else if(first_name!=undefined && last_name==undefined && profile_pic==undefined){
+            await UserModel.update({ 
+                first_name:first_name }, {
+                where: {
+                    id:this.user_id
+                }
+              });
             return true;
 
         }else if(first_name!=undefined && last_name!=undefined && profile_pic==undefined){
             await UserModel.update({ 
-                first_name:frist_name , 
+                first_name:first_name , 
                 last_name:last_name}, {
                 where: {
-                    id:user_id
+                    id:this.user_id
                 }
               })
             return true;
@@ -140,7 +162,7 @@ class User{
                 last_name:last_name,
                 profile_pic:profile_pic}, {
                 where: {
-                    id:user_id
+                    id:this.user_id
                 }
               })
             return true;
@@ -149,25 +171,26 @@ class User{
             await UserModel.update({ 
                 profile_pic:profile_pic}, {
                 where: {
-                    id:user_id
+                    id:this.user_id
                 }
               })
             return true;
 
-        }else if(first_name==undefined && last_name==undefined && profile_pic!=undefined){
+        }else if(first_name==undefined && last_name!=undefined && profile_pic==undefined){
             await UserModel.update({  
                 last_name:last_name}, {
                 where: {
-                    id:user_id
+                    id:this.user_id
                 }
               })
             return true;
 
-        }else if(first_name==undefined && last_name!=undefined && profile_pic!=undefined){
+        }else if(first_name!=undefined && last_name!=undefined && profile_pic!=undefined){
             await UserModel.update({ 
-                first_name:frist_name}, {
+                first_name:first_name,
+            profile_pic:profile_pic}, {
                 where: {
-                    id:user_id
+                    id:this.user_id
                 }
               })
             return true;
@@ -326,21 +349,90 @@ class User{
             where:
                 [{user_id:`${user_id}`}]
         });
+        var recommendations=[]
+        for (const i in records){
+            let recommended_by= records[i].Recommended_by;
+            let description=records[i].description;
+
+            let recommended_name=await UserModel.findOne({
+            attributes:["first_name","last_name"],
+            where:{id:recommended_by},raw:true
+            });
+
+            recommended_name.description=description;
+            recommendations.push(recommended_name);
+
+        }
     
         const skills=await SkillModel.findAll({
             attributes:['name','validations'], raw: true,
             where:
                 [{user_id:`${user_id}`}]
-        })
+        });
+
+        var profile=[];
+        profile.push(user);
+        profile.push(skills);
+        profile.push(recommendations);
+
+        let connections1 = await ConnectionModel.findAll({
+            attributes:["requester_id"],
+            where:{[Op.and]:[{
+                recipient_id:user_id
+            },{state:"accepted"}]
+        },raw:true});
+
+        let connections2 = await ConnectionModel.findAll({
+            attributes:["recipient_id"],
+            where:{[Op.and]:[{
+                requester_id:user_id
+            },{state:"accepted"}]
+        },raw:true});
+
+        var names=[];
+
+        for (const x in connections1){
+            let con_id=connections1[x].requester_id;
+           // console.log(con_id);
+            
+            let name=await UserModel.findOne({
+                attributes:["first_name","last_name"],
+                where:{
+                    id:con_id
+                },raw:true
+            });
+            //Object.assign({},name);
+
+            names.push(name);
+
+        }
+
+        for (const y in connections2){
+            let con_id=connections2[y].recipient_id;
+           // console.log(con_id);
+            
+            let name=await UserModel.findOne({
+                attributes:["first_name","last_name"],
+                where:{
+                    id:con_id
+                },raw:true
+            });
+            //console.log(name);
+            //Object.assign({},name);
+            names.push(name);
+
+        }
+
+        
+        profile.push(names);
+
+        //console.log(connections);
         //return records;
         //return user;
         //return mergeduser;
-        return [
-            user,
-            records,
-            skills
-        ]
+        return profile;
     }
+
 
 
 
