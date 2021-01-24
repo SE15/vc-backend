@@ -1,10 +1,11 @@
-const User = require('../services/user.js');
+const Guest = require('../services/guest.js');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const config = require('config');
+const md5 = require('md5');
 
 // Instantiate User:
-//let guest = new Guest();
+let guest = new Guest();
 
 const guestController  = {};
 
@@ -55,8 +56,8 @@ guestController.viewProfile = async (req, res, next) => {
 
 guestController.createAccount = async (req, res, next) => {
     try {
-        const { name, email, password, profilePic } = req.body;
-        const information = [{name, email, password, profilePic}];
+        const { first_name,last_name, email, password } = req.body;
+        const information = [{first_name,last_name, email, password}];
         const response = await guest.createAccount(information);
 
         if(response === true){
@@ -87,15 +88,20 @@ guestController.createAccount = async (req, res, next) => {
     }
   };
 
-  guestController.login = (req, res, next) => {
+  guestController.login = async(req, res, next) => {
     try {
         const email = req.query.email; 
         const password = req.query.password; 
-
-        const user = guest.getUser(email);
-
+        
+        let user = await guest.getUser(email);
+        //console.log(user); 
         //validate password
-        bcrypt.compare(password, user.password)
+        //console.log(user[0]);
+        let pass = user[0][0].password;
+        //console.log(pass);
+         let passw = md5(password);
+        let usr = user[0][0];
+        /*bcrypt.compare(passw, pass)
         .then(isMatch => {
             if(!isMatch){
                 const response = {
@@ -119,7 +125,27 @@ guestController.createAccount = async (req, res, next) => {
                 }
             )
         });
-
+*/    if (pass===passw){
+          jwt.sign(
+            {id: usr.id},
+            config.get('jwtSecret'),
+            { expiresIn: 3600 },
+            (err, token) => {
+                if(err) throw err;
+                return res.json({
+                    token,
+                    user: user
+                });
+            })
+            //console.log(usr.id);
+          }else{
+            const response = {
+              err: 1,
+              obj: {},
+              msg: "Invalid password"
+            }
+            return res.json(response);
+          }
       
     } catch (err) {
       next(err);

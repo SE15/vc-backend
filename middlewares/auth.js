@@ -15,9 +15,23 @@ function authorization(req, res, next){
 
     try{
         //verify token
+        console.log(token);
         const decoded = jwt.verify(token, config.get('jwtSecret'));
+        if(!decoded){
+            const response = {
+                err: 1,
+                obj: {},
+                msg: "AToken verification failed"
+            }
+            return res.json(response);
+        }else{
+            req.user = decoded;
+            next();
+        }
         //add user from payload
-        req.user = decoded;
+        //req.user = decoded;
+        //console.log(req.user.id);
+        //console.log(decoded.id);
 
     }catch(err){
         const response = {
