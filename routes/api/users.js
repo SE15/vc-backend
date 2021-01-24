@@ -5,7 +5,7 @@ const authorization = require('../../middlewares/auth');
 const userController = require('../../controllers/userController');
 
 //user routes
-router.get('/users/',  userController.searchUser);
+router.get('/users/', authorization, userController.searchUser);
 router.get('/users/:id', authorization, userController.viewProfile);
 router.post('/users/skills/add', authorization, userController.addSkill);
 router.delete('/users/skills/:id', authorization, userController.removeSkill);
