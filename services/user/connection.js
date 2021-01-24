@@ -10,13 +10,14 @@ class Connection {
         
     }
 
-     async saveToDatabase(isNew, t = null){
+    async saveToDatabase(isNew, t = null){
         //adding a new connection to the database
         
         if (isNew == true) { 
             await ConnectionModel.create({ 
                 requester_id: this.requester_id,
-                recipient_id: this.recipient_id}, { transaction: t });
+                recipient_id: this.recipient_id,
+                state:"pending"}, { transaction: t });
             let result = await ConnectionModel.findOne({where: {
                 [Op.and]: [
                     { requester_id: this.requester_id },
@@ -69,13 +70,15 @@ class Connection {
         let cnt1 = await ConnectionModel.count({where: {
             [Op.and]: [
                 { recipient_id: recipient_id },
-                { requester_id: reque_id }
+                { requester_id: reque_id },
+                { state:'pending'}
             ] 
         }})
         let cnt2 = await ConnectionModel.count({where: {
             [Op.and]: [
                 { requester_id: recipient_id },
-                { recipient_id: reque_id }
+                { recipient_id: reque_id },
+                { state:'pending'}
             ] 
         }})
         
@@ -89,9 +92,9 @@ class Connection {
             }
         } else {
             if(cnt1!=0){
-                throw new Error('You have already sent a request');
+                return false;
             }else{
-                throw new Error('You already got a request');
+                return false;
             }
 
                 
@@ -99,16 +102,17 @@ class Connection {
         
     }
 
-    static async updateState(recipient_id,reque_id,accept,t=null){
+    static async updateState(recipi_id,requester_id,accept,t=null){
         if(accept===true){
                 await ConnectionModel.update({ 
                     
                     state: "accepted"},{
                     where: {
                         [Op.and]: [
-                            { requester_id: reque_id },
-                            { recipient_id: recipient_id }
+                            { requester_id: requester_id },
+                            { recipient_id: recipi_id }
                         ]}, transaction : t});
+                        return true;
             
             }
 
@@ -118,12 +122,13 @@ class Connection {
                     state: "rejected"},{
                     where: {
                         [Op.and]: [
-                            { requester_id: reque_id },
-                            { recipient_id: recipient_id }
+                            { requester_id: requester_id },
+                            { recipient_id: recipi_id }
                         ]}, transaction : t});
+                return false;
                        
             }   
-        return true; 
+         
         
         
         }

@@ -57,10 +57,10 @@ class Skill {
                     throw err;
                 }
             } else {
-                throw new Error('You have already validated this skill');
+                return "validated";
             }
         } else {
-            throw new Error('You cannot validate your own skill');
+            return 'You cannot validate your own skill';
         }
     }
 
@@ -70,8 +70,14 @@ class Skill {
      * @return boolean - true if successfully deleted
      */
     async destroy() {
-        await SkillModel.destroy({where: {id: this.id}});
-        return true;
+        let deleteSkill=await SkillModel.destroy({where: {id: this.id}});
+
+        if(deleteSkill==true){
+            return true;
+        }else{
+            return false;
+        }
+        
     }
     
     /**
@@ -82,40 +88,45 @@ class Skill {
      * @returns {Promise} Promise of 'true' - successfully saved
      * @throws UnhandledPromiseRejectionWarning
      */
-     async saveToDatabase(isNew, t = null){
-        //adding a new skill to the database
-        if (isNew == true) { 
-            await SkillModel.create({ 
-                user_id: this.user_id,
-                name: this.name}, { transaction: t });
-                //obtaining the id of the skill
-            let result = await SkillModel.findOne({where: {
-                [Op.and]: [
-                    { user_id: this.user_id },
-                    { name: this.name }
-            ]}}, { transaction: t });
-            this.id = result.id;
-            this.validations = result.validations;
-            return true; 
-        
-        //updating an existing skill in the database
-        } else { 
-            if (t !== null) { //query should be atomic
-                await SkillModel.update({ 
-                    user_id: this.user_id,
-                    name: this.name,
-                    validations: this.validations},{
-                    where: {id: this.id}, transaction : t});
-            } else {
-                await SkillModel.update({ 
-                    user_id: this.user_id,
-                    name: this.name,
-                    validations: this.validations},{
-                    where: {id: this.id}}); 
-            }
-            return true;
-        }
-    }
+    async saveToDatabase(isNew, t = null){
+        try{
+       //adding a new skill to the database
+       if (isNew == true) { 
+           await SkillModel.create({ 
+               user_id: this.user_id,
+               name: this.name}, { transaction: t });
+               //obtaining the id of the skill
+           let result = await SkillModel.findOne({where: {
+               [Op.and]: [
+                   { user_id: this.user_id },
+                   { name: this.name }
+           ]}}, { transaction: t });
+           this.id = result.id;
+           this.validations = result.validations;
+           return true; 
+       
+       //updating an existing skill in the database
+       } else { 
+           if (t !== null) { //query should be atomic
+               await SkillModel.update({ 
+                   user_id: this.user_id,
+                   name: this.name,
+                   validations: this.validations},{
+                   where: {id: this.id}, transaction : t});
+           } else {
+               await SkillModel.update({ 
+                   user_id: this.user_id,
+                   name: this.name,
+                   validations: this.validations},{
+                   where: {id: this.id}}); 
+           }
+           return true;
+       }
+   }catch(err){
+       return false;
+   }
+   }
+
 
     /**
      * Returns skill information

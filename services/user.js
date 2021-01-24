@@ -3,7 +3,7 @@ const bcrypt = require("bcrypt");
 const UserModel=require('../models/user-model');
 const SkillModel=require('../models/skill-model');
 const ConnectionModel=require('../models/connection-model');
-const ReccomendationModel=require('../models/recommendation-model');
+const RecommendationModel=require('../models/recommendation-model');
 const sequelize=require('../config/database');
 const { raw } = require('express');
 const { or } = require('sequelize');
@@ -17,30 +17,20 @@ class User{
     constructor(){
         try {
             sequelize.authenticate();
-            console.log('Connection has been established successfully.');
+            //console.log('Connection has been established successfully.');
         } catch (error) {
-            console.error('Unable to connect to the database:', error);
+            //console.error('Unable to connect to the database:', error);
         }
     }
 
-    static async create(id) {
+    static async createUser(id) {
         //gets the information from the database
         let userInfo = await UserModel.findOne({where: {id: id}});
         return new User(userInfo);
     }
 
 
-    async addUser(first_name,last_name,email,password){
-
-        let hashPassword = md5(password);
-        const newUser= await UserModel.create({
-            first_name: `${first_name}`,
-            last_name:`${last_name}`,
-            email: `${email}`,
-            password: `${hashPassword}`,
-     
-    });
-    }
+    
 
     async getAllUsers(){
       
@@ -58,7 +48,7 @@ class User{
         const user=UserModel.findAll({
             attributes:['first_name','last_name','profile_pic'], raw: true,
             where:{
-                [Op.or]:[{first_name: `${name}`},{last_name: `${name}`}]
+                [Op.or]:[{first_name: `${name}`,is_deleted:0},{last_name: `${name}`, is_deleted:0}]
                     
             }
         });
@@ -69,8 +59,8 @@ class User{
     async deleteAccount(){
 
         //temp data
-        this.user_id = 22;
-        await UserModel.update({ 
+        this.user_id = 1;
+        let deleteUser = await UserModel.update({ 
                     
             is_deleted: 1},{
                 where: {
@@ -79,12 +69,31 @@ class User{
                     {is_deleted:0}
                     ]     
         }});
-        return true;        
+        let deleteSkills=await SkillModel.destroy({
+            where:{
+                user_id:this.user_id
+            }
+        });
+
+        let deleteRecommendations=await RecommendationModel.destroy({
+            where:{
+                user_id:this.user_id,
+            }
+        });
+
+        console.log(deleteSkills,deleteRecommendations);
+
+        if (deleteUser==1 && deleteSkills!=null && deleteRecommendations!=null){
+            return true;   
+        }else{
+            return false;
+        }
+             
     }
 
     async changePassword(oldPassword,newPassword){
         //temp data
-        this.user_id=16;
+        this.user_id=30;
         
         let result = await UserModel.findOne({where: {id: this.user_id}});
         let hashPassword = result.password;
@@ -102,7 +111,7 @@ class User{
             return true;        
 
         }else{
-            console.log('Password does not match');
+            //console.log('Password does not match');
             return false;
         }
     
@@ -110,69 +119,81 @@ class User{
 
      //method for all the attributes not passes when editing profile 
      async editProfile(details){
-        let user_id=2;
+        this.user_id=30;
         var first_name=details[0].first_name;
         var last_name=details[0].last_name;
         var profile_pic=details[0].profile_pic;
         if (first_name==undefined && last_name==undefined && profile_pic==undefined){
-             return "You didn't made any changes";
+             return false;
         
-        }else if(first_name!=undefined && last_name==undefined && profile_pic!=undefined){
+        }else if(first_name!=undefined && last_name!=undefined && profile_pic!=undefined){
             await UserModel.update({ 
-                first_name:frist_name , 
-                profile_pic:profile_pic}, {
+                first_name:first_name,
+                last_name:last_name,
+                profile_pic:profile_pic
+            }, {
                 where: {
-                    id:user_id
+                    id:this.user_id
                 }
               })
-            return "successfully Update Details";
+            return true;
+            
+        }else if(first_name!=undefined && last_name==undefined && profile_pic==undefined){
+            await UserModel.update({ 
+                first_name:first_name }, {
+                where: {
+                    id:this.user_id
+                }
+              });
+            return true;
 
         }else if(first_name!=undefined && last_name!=undefined && profile_pic==undefined){
             await UserModel.update({ 
-                first_name:frist_name , 
+                first_name:first_name , 
                 last_name:last_name}, {
                 where: {
-                    id:user_id
+                    id:this.user_id
                 }
               })
-            return "successfully Update Details";
+            return true;
 
         }else if(first_name==undefined && last_name!=undefined && profile_pic!=undefined){
             await UserModel.update({  
                 last_name:last_name,
                 profile_pic:profile_pic}, {
                 where: {
-                    id:user_id
+                    id:this.user_id
                 }
               })
-            return "successfully Update Details";
+            return true;
 
         }else if(first_name==undefined && last_name==undefined && profile_pic!=undefined){
             await UserModel.update({ 
                 profile_pic:profile_pic}, {
                 where: {
-                    id:user_id
+                    id:this.user_id
                 }
               })
-            return "successfully Update Details";
+            return true;
 
-        }else if(first_name==undefined && last_name==undefined && profile_pic!=undefined){
+        }else if(first_name==undefined && last_name!=undefined && profile_pic==undefined){
             await UserModel.update({  
                 last_name:last_name}, {
                 where: {
-                    id:user_id
+                    id:this.user_id
                 }
               })
-            return "successfully Update Details";
+            return true;
 
-        }else if(first_name==undefined && last_name!=undefined && profile_pic!=undefined){
+        }else if(first_name!=undefined && last_name!=undefined && profile_pic!=undefined){
             await UserModel.update({ 
-                first_name:frist_name}, {
+                first_name:first_name,
+            profile_pic:profile_pic}, {
                 where: {
-                    id:user_id
+                    id:this.user_id
                 }
               })
-            return "successfully Update Details";
+            return true;
             
         }
         }
@@ -197,21 +218,25 @@ class User{
     async addConnection(recipient_id) {
         //temp data
         
-        this.requester_id = 2;
+        this.requester_id = 6;
         let reque_id=this.requester_id;
         let checkin=null;
             
         checkin = await Connection.checkValidations(recipient_id,reque_id);
-          
-           
+                  
+        try{   
         if(checkin===true){
                     
             let connection = new Connection({requester_id: this.requester_id, recipient_id: recipient_id});
             return await connection.saveToDatabase(true);
+            
             //return connection;
        
         }else{
-            return "Already exists";
+            return "sent";
+        }
+        }catch(e){
+            return "Something went wrong";
         }
     }
 
@@ -225,21 +250,30 @@ class User{
         
     }
 
-    async  respondConnection(recipient_id,accept){
+    async  respondConnection(requester_id,accept){
 
-        this.requester_id = 2;
-        let reque_id=this.requester_id;
+        this.recipient_id = 11;
+        let recipi_id=this.recipient_id;
         let res = null;
     
-        
-        res = await Connection.updateState(recipient_id,reque_id,accept);
-        return res;
-    
+        let cnt2 = await ConnectionModel.count({where: {
+            [Op.and]: [
+                { requester_id: requester_id },
+                { recipient_id: recipi_id },
+                { state:'pending'}
+            ] 
+        }})
+        if(cnt2 > 0){
+            res = await Connection.updateState(recipi_id,requester_id,accept);
+            return res;
+        }else{
+            return "removed one/ accepted one";
+        }
     }
 
     async validateSkill(id) {
         //temp values
-        this.user_id = 10;
+        this.user_id = 1;
 
         let skill = await Skill.create(id);
         return await skill.incrementValidations(this.user_id);
@@ -248,17 +282,23 @@ class User{
 
     async addSkill(name) {
         //temp data
-        this.user_id = 2;
     
+        this.user_id = 1;
         let skill = new Skill({user_id: this.user_id, name: name});
-        return await skill.saveToDatabase(true);
+        let addSkill= await skill.saveToDatabase(true);
+        if(addSkill==true){
+            return true;
+        }else{
+            return false;
+        }
         //return skill;
         
     }
 
     async removeSkill(id) {
         //temp data
-        this.user_id = 1;
+        //this.user_id = 1;
+        id=`${id}`
     
         let skill = await Skill.create(id);
         return await skill.destroy();
@@ -267,7 +307,7 @@ class User{
 
     async submitRecommendation(user_id,description) {
         //temp data
-        this.recommended_by = 11;
+        this.recommended_by = 1;
         let recommended_by= this.recommended_by
         let check_validation=null;
     
@@ -294,73 +334,118 @@ class User{
     }
 
     async viewProfile(user_id){
-        user_id:user_id;
        
         const user=await UserModel.findAll({
             attributes:['first_name','last_name','profile_pic'], raw: true,
-            where:{
-                id:user_id
+            where:{[Op.and]:
+                [{id:`${user_id}`,is_deleted:0}]
                     
             }
     
             });
+       
         const records= await RecommendationModel.findAll({
             attributes:['Recommended_by','description'], raw: true,
             where:
-                [{user_id:user_id}]
+                [{user_id:`${user_id}`}]
         });
+        var recommendations=[]
+        for (const i in records){
+            let recommended_by= records[i].Recommended_by;
+            let description=records[i].description;
+
+            let recommended_name=await UserModel.findOne({
+            attributes:["first_name","last_name"],
+            where:{id:recommended_by},raw:true
+            });
+
+            recommended_name.description=description;
+            recommendations.push(recommended_name);
+
+        }
     
         const skills=await SkillModel.findAll({
             attributes:['name','validations'], raw: true,
             where:
-                [{user_id:user_id}]
-        })
+                [{user_id:`${user_id}`}]
+        });
+
+        var profile=[];
+        profile.push(user);
+        profile.push(skills);
+        profile.push(recommendations);
+
+        let connections1 = await ConnectionModel.findAll({
+            attributes:["requester_id"],
+            where:{[Op.and]:[{
+                recipient_id:user_id
+            },{state:"accepted"}]
+        },raw:true});
+
+        let connections2 = await ConnectionModel.findAll({
+            attributes:["recipient_id"],
+            where:{[Op.and]:[{
+                requester_id:user_id
+            },{state:"accepted"}]
+        },raw:true});
+
+        var names=[];
+
+        for (const x in connections1){
+            let con_id=connections1[x].requester_id;
+           // console.log(con_id);
+            
+            let name=await UserModel.findOne({
+                attributes:["first_name","last_name"],
+                where:{
+                    id:con_id
+                },raw:true
+            });
+            //Object.assign({},name);
+
+            names.push(name);
+
+        }
+
+        for (const y in connections2){
+            let con_id=connections2[y].recipient_id;
+           // console.log(con_id);
+            
+            let name=await UserModel.findOne({
+                attributes:["first_name","last_name"],
+                where:{
+                    id:con_id
+                },raw:true
+            });
+            //console.log(name);
+            //Object.assign({},name);
+            names.push(name);
+
+        }
+
+        
+        profile.push(names);
+
+        //console.log(connections);
         //return records;
         //return user;
         //return mergeduser;
-        return [
-            user,
-            records,
-            skills
-        ]
+        return profile;
     }
 
 
-    async  createAccount(info) {
-        //check if the user had already created an account 
-        let guest_email = info[0].email;
-        let cnt = await UserModel.count({where: {
-            [Op.and]: [
-                { email: guest_email },
-                { is_deleted: 0 }
-        ]}});
-    
-        if (cnt > 0) {
-            return "Already you have an account";
 
-        }else{
-            let guest_first_name = info[0].first_name;
-            let guest_last_name = info[0].last_name;
-            let guest_password = info[0].password;
-            
+
     
-            let result = new User();
-            await result.addUser(guest_first_name, guest_last_name,guest_email,guest_password);
-            return true;
-         
-        }
-            
-    }
-   
 }
-
-user1=new User();
+module.exports = User;
+//user1=new User();
 //user1.addConnection(11).then(result => console.log('Connection Added: ', result));
 //user1.removeConnection(11).then(result => console.log('Connection Removed: ', result));
 //user1.respondConnection(10,false).then(result => console.log('Connection state updated: ', result));
 
 //user1.validateSkill(4).then(result => console.log('Skill Validated:', result));
-//user1.addSkill('node hh').then(result => console.log('Skill Added: ', result));
+//user1.addSkill('mysql skills11').then(result => console.log('Skill Added: ', result));
 //user1.removeSkill(60).then(result => console.log('Skill Removed: ', result));
 
 //user1.submitRecommendation(1,'recommnded').then(result => console.log('Recommendation Added: ', result));
@@ -368,7 +453,9 @@ user1=new User();
 //user1.viewProfile(1).then(result=>console.log('Profile: ', result));
 
 //user1.deleteAccount().then(result => console.log('Account Deleted: ', result));
-//user1.changePassword("543","123").then(result => console.log('Password Changed: ', result));;
-//user1.addUser("Chamara", "Weerasinghe","chamara@gmail.com","kk");
-// viewEvent(1).then(result=>console.log("Event Details: ",result));
-//user1.createAccount([{first_name: "Lahiru" ,last_name: "Madhushan", email:'lahiru@gmail.com', password:'abc'}]).then(result => console.log('Account Creation: ', result));
+//user1.changePassword("123","456").then(result => console.log('Password Changed: ', result));;
+//user1.addUser("kamar", "sangakkara","sanga@gmail.com","123");
+//user1.viewEvent(1).then(result=>console.log("Event Details: ",result));
+//user1.viewEvent(1).then(result=>console.log("Event Details: ",result));
+
+//user1.searchUser("Lahiru").then(result=>console.log("Search Details: ",result));
