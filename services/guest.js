@@ -171,6 +171,7 @@ class Guest{
     }
 
     async getUser(email){
+        
 
         const login_id = await UserModel.findOne({
             arrtibute:["id"],
@@ -179,11 +180,11 @@ class Guest{
             },raw:true
         });
 
-
+        
         let user_id= login_id.id;
        
         const user=await UserModel.findAll({
-            attributes:['first_name','last_name','profile_pic'], raw: true,
+            attributes:['first_name','last_name','profile_pic','password','id'], raw: true,
             where:{[Op.and]:
                 [{id:user_id,is_deleted:0}]
                     
@@ -277,7 +278,9 @@ class Guest{
         //return records;
         //return user;
         //return mergeduser;
+        
         return profile;
+        
     }
 
 
@@ -288,3 +291,4 @@ module.exports=Guest;
 //guest1.searchUser("Lahiru").then(result => console.log('Connection Added: ', result));
 //guest1.createAccount([{first_name: "Lahiru" ,last_name: "Madhushan", email:'lahiru1@gmail.com', password:'abc'}]).then(result => console.log('Account Creation: ', result));
 //guest1.viewProfile(2).then(result => console.log('Profile Status: ', result));
+//guest1.getUser("sanga@gmail.com").then(result => console.log('Connection Added: ', result));
