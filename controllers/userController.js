@@ -8,9 +8,13 @@ const userController  = {};
 //user functions
 userController.searchUser = async (req, res, next) => {
     try {
+        //console.log("usr");
+        //let ff = req.user;
+        //console.log(ff.id);
+        
         const keyword = req.query.keyword;    
         const users = await user.searchUser(keyword);
-
+        
         if(users.length){
           const response = {
             err: 0,
@@ -51,7 +55,10 @@ userController.viewProfile = async (req, res, next) => {
 
 userController.deleteAccount = async (req, res, next) => {
     try {
-        const responce = await user.deleteAccount();
+      
+        let passedid = req.user;
+
+        const responce = await user.deleteAccount(passedid.id);
         
         if(responce === true){
           const response = {
@@ -75,8 +82,11 @@ userController.deleteAccount = async (req, res, next) => {
 
 userController.addSkill = async (req, res, next) => {
     try {
+        let passedid = req.user;
         const name = req.body.name;
-        const responce = await User.addSkill(name);
+        
+        const responce = await User.addSkill(name,passedid.id);
+        
 
         if(responce === true){
           const response = {
@@ -132,8 +142,9 @@ userController.removeSkill = async (req, res, next) => {
 
 userController.validateSkill = async (req, res, next) => {
     try {
+         let passedid = req.user;
         const skillID = req.params.id;    
-        const responce = await user.validateSkill(skillID);
+        const responce = await user.validateSkill(skillID,passedid.id);
 
         if(responce === true){
           const response = {
@@ -164,8 +175,9 @@ userController.validateSkill = async (req, res, next) => {
 
 userController.addConnection = async (req, res, next) => {
     try {
+      let passedid = req.user;
         const userID = req.params.id;    
-        const responce = await user.addConnection(userID);
+        const responce = await user.addConnection(userID,passedid.id);
 
         if(responce === true){
           const response = {
@@ -196,10 +208,11 @@ userController.addConnection = async (req, res, next) => {
   
 userController.respondConnection = async (req, res, next) => {
     try {
+        let passedid = req.user;
         const connectionID = req.params.id;
         const accept = req.body.accept;
         
-        const responce = await user.respondConnection(connectionID,accept);
+        const responce = await user.respondConnection(connectionID,accept,passedid.id);
 
         if(responce === true){
           const response = {
@@ -230,8 +243,9 @@ userController.respondConnection = async (req, res, next) => {
 
 userController.removeConnection = async (req, res, next) => {
     try {
+        let passedid = req.user;
         const userID = req.params.id;    
-        const responce = await user.removeConnection(userID);
+        const responce = await user.removeConnection(userID,passedid.id);
 
         if(responce === true){
           const response = {
@@ -255,9 +269,10 @@ userController.removeConnection = async (req, res, next) => {
 
 userController.submitRecommendation = async (req, res, next) => {
     try {
+        let passedid = req.user;
         const userID = req.params.id;   
         const description = req.body.description;    
-        const responce = await user.submitRecommendation(userID, description);
+        const responce = await user.submitRecommendation(userID, description,passedid.id);
 
         if(responce === true){
           const response = {
@@ -281,10 +296,11 @@ userController.submitRecommendation = async (req, res, next) => {
 
 userController.changePassword = async (req, res, next) => {
     try {
+        let passedid = req.user;
         const oldPass = req.body.oldPass;
         const newPass = req.body.newPass;
         
-        const responce = await user.changePassword(oldPass, newPass);
+        const responce = await user.changePassword(oldPass, newPass,passedid.id);
 
         if(responce === true){
           const response = {
@@ -308,8 +324,9 @@ userController.changePassword = async (req, res, next) => {
 
 userController.editProfile = async (req, res, next) => {
     try {
+        let passedid = req.user;
         const information = req.body;   // convert to an array 
-        const responce = await user.editProfile(information);
+        const responce = await user.editProfile(information,passedid.id);
 
         if(responce === true){
           const response = {
