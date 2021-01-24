@@ -44,10 +44,18 @@ app.use((req, res, next) => {
   // no stacktraces leaked to user unless in development environment
   app.use((err, req, res, next) => {
     if (err.status === 404) {
-        console.log("sf");
-        return res.status(404).json({msg: err});
+        const response = {
+            err: 1,
+            obj: {},
+            msg: "Not found"
+        }
+        return res.json(response);
     } else {
-        console.log("sf");
-        return res.json({msg: err});
+        const response = {
+            err: 1,
+            obj: {},
+            msg: "Exception occured"
+        }
+        return res.json(response);
     }
   });

@@ -5,13 +5,13 @@ const authorization = require('../../middlewares/auth');
 const userController = require('../../controllers/userController');
 
 //user routes
-router.get('/users/', authorization, userController.searchUsers);
+router.get('/users/',  userController.searchUser);
 router.get('/users/:id', authorization, userController.viewProfile);
 router.post('/users/skills/add', authorization, userController.addSkill);
 router.delete('/users/skills/:id', authorization, userController.removeSkill);
 router.put('/users/skills/:id', authorization, userController.validateSkill);
-router.post('/users/connections/add/:id', authorization, userController.addConnection);
-router.put('/users/connections/respond/:id', authorization, userController.respondConnection);
+router.post('/users/connections/add/:id',authorization, userController.addConnection);
+router.put('/users/connections/respond/:id',authorization, userController.respondConnection);
 router.delete('/users/connections/:id', authorization, userController.removeConnection);
 router.post('/users/recommendations/:id', authorization, userController.submitRecommendation);
 router.delete('/users/', authorization, userController.deleteAccount);

@@ -6,7 +6,12 @@ function authorization(req, res, next){
 
     //check for token
     if(!token){
-        return res.status(401).json({msg: "No token, authorization denied"});
+        const response = {
+            err: 1,
+            obj: {},
+            msg: "No token, authorization denied"
+        }
+        return res.json(response);
     }
 
     try{
