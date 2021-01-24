@@ -56,10 +56,10 @@ class User{
     
     }
 
-    async deleteAccount(){
+    async deleteAccount(passedid){
 
         //temp data
-        this.user_id = 1;
+        this.user_id = passedid;
         let deleteUser = await UserModel.update({ 
                     
             is_deleted: 1},{
@@ -80,20 +80,29 @@ class User{
                 user_id:this.user_id,
             }
         });
+        let deleteConnections = await ConnectionModel.destroy({
+            where:{
+                [Op.or]:[
+                    {recipient_id:this.user_id},
+                {requester_id:this.user_id}
+            ]}
+        })
+        //console.log(deleteSkills,deleteRecommendations);
 
-        console.log(deleteSkills,deleteRecommendations);
-
-        if (deleteUser==1 && deleteSkills!=null && deleteRecommendations!=null){
+        if (deleteUser==1 && deleteSkills!=null && deleteRecommendations!=null&& deleteConnections!=null){
             return true;   
         }else{
             return false;
         }
+
+        
+        
              
     }
 
-    async changePassword(oldPassword,newPassword){
+    async changePassword(oldPassword,newPassword,passedid){
         //temp data
-        this.user_id=30;
+        this.user_id=passedid;
         
         let result = await UserModel.findOne({where: {id: this.user_id}});
         let hashPassword = result.password;
@@ -118,11 +127,11 @@ class User{
     }
 
      //method for all the attributes not passes when editing profile 
-     async editProfile(details){
-        this.user_id=30;
-        var first_name=details[0].first_name;
-        var last_name=details[0].last_name;
-        var profile_pic=details[0].profile_pic;
+     async editProfile(details,passedid){
+        this.user_id=passedid;
+        var first_name=details.first_name;
+        var last_name=details.last_name;
+        var profile_pic=details.profile_pic;
         if (first_name==undefined && last_name==undefined && profile_pic==undefined){
              return false;
         
@@ -215,10 +224,10 @@ class User{
             return "successfully Update Details";
         }*/
     
-    async addConnection(recipient_id) {
+    async addConnection(recipient_id,passedid) {
         //temp data
         
-        this.requester_id = 6;
+        this.requester_id = passedid;
         let reque_id=this.requester_id;
         let checkin=null;
             
@@ -240,9 +249,9 @@ class User{
         }
     }
 
-    async  removeConnection(recipient_id) {
+    async  removeConnection(recipient_id,passedid) {
         //temp data
-        this.requester_id = 2;
+        this.requester_id = passedid;
         let reque_id=this.requester_id;
             
         let connection = await Connection.create(recipient_id,reque_id);
@@ -250,9 +259,9 @@ class User{
         
     }
 
-    async  respondConnection(requester_id,accept){
+    async  respondConnection(requester_id,accept,passedid){
 
-        this.recipient_id = 11;
+        this.recipient_id = passedid;
         let recipi_id=this.recipient_id;
         let res = null;
     
@@ -263,6 +272,7 @@ class User{
                 { state:'pending'}
             ] 
         }})
+        
         if(cnt2 > 0){
             res = await Connection.updateState(recipi_id,requester_id,accept);
             return res;
@@ -271,19 +281,19 @@ class User{
         }
     }
 
-    async validateSkill(id) {
+    async validateSkill(id,passedid) {
         //temp values
-        this.user_id = 1;
+        this.user_id = passedid;
 
         let skill = await Skill.create(id);
         return await skill.incrementValidations(this.user_id);
         
     }
 
-    async addSkill(name) {
+    async addSkill(name,passedid) {
         //temp data
     
-        this.user_id = 1;
+        this.user_id = passedid;
         let skill = new Skill({user_id: this.user_id, name: name});
         let addSkill= await skill.saveToDatabase(true);
         if(addSkill==true){
@@ -291,6 +301,7 @@ class User{
         }else{
             return false;
         }
+        
         //return skill;
         
     }
@@ -305,9 +316,9 @@ class User{
         
     }
 
-    async submitRecommendation(user_id,description) {
+    async submitRecommendation(user_id,description,passedid) {
         //temp data
-        this.recommended_by = 1;
+        this.recommended_by = passedid;
         let recommended_by= this.recommended_by
         let check_validation=null;
     
@@ -442,15 +453,15 @@ module.exports = User;
 //user1=new User();
 //user1.addConnection(11).then(result => console.log('Connection Added: ', result));
 //user1.removeConnection(11).then(result => console.log('Connection Removed: ', result));
-//user1.respondConnection(10,false).then(result => console.log('Connection state updated: ', result));
+//user1.respondConnection(32,true).then(result => console.log('Connection state updated: ', result));
 
 //user1.validateSkill(4).then(result => console.log('Skill Validated:', result));
-//user1.addSkill('mysql skills11').then(result => console.log('Skill Added: ', result));
+//user1.addSkill('mysql hh').then(result => console.log('Skill Added: ', result));
 //user1.removeSkill(60).then(result => console.log('Skill Removed: ', result));
 
 //user1.submitRecommendation(1,'recommnded').then(result => console.log('Recommendation Added: ', result));
 //user1.showRecommendation(1).then(result=>console.log('Recommendation Records: ',result));
-//user1.viewProfile(1).then(result=>console.log('Profile: ', result));
+//user1.viewProfile(2).then(result=>console.log('Profile: ', result));
 
 //user1.deleteAccount().then(result => console.log('Account Deleted: ', result));
 //user1.changePassword("123","456").then(result => console.log('Password Changed: ', result));;
