@@ -40,7 +40,7 @@ guestController.searchUser = async (req, res, next) => {
 
 guestController.viewProfile = async (req, res, next) => {
     try {
-        const userID = req.params.id;    
+        const userID = req.params.userid;    
         const profile = await guest.viewProfile(userID);
 
         const response = {
@@ -142,8 +142,6 @@ guestController.createAccount = async (req, res, next) => {
                 });
                 
             })
-
-            //console.log(usr.id);
           }else{
             const response = {
               err: 1,

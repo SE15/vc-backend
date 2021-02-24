@@ -39,7 +39,7 @@ userController.searchUser = async (req, res, next) => {
 
 userController.viewProfile = async (req, res, next) => {
     try {
-        const userID = req.params.id;    
+        const userID = req.params.userid;    
         const profile = await user.viewProfile(userID);
         
         const response = {
@@ -55,7 +55,7 @@ userController.viewProfile = async (req, res, next) => {
 
 userController.deleteAccount = async (req, res, next) => {
     try {
-      
+        //user id taken from authentication not from url but passes in url
         let passedid = req.user;
 
         const responce = await user.deleteAccount(passedid.id);
@@ -82,6 +82,7 @@ userController.deleteAccount = async (req, res, next) => {
 
 userController.addSkill = async (req, res, next) => {
     try {
+        //user id taken from authentication not from url but passes in url
         let passedid = req.user;
         const name = req.body.name;
         
@@ -117,7 +118,8 @@ userController.addSkill = async (req, res, next) => {
 
 userController.removeSkill = async (req, res, next) => {
     try {
-        const skillID = req.params.id;    
+        //userid passes from url but do not pass to services
+        const skillID = req.params.skillid;    
         const responce = await user.removeSkill(skillID);
 
         if(responce === true){
@@ -142,8 +144,9 @@ userController.removeSkill = async (req, res, next) => {
 
 userController.validateSkill = async (req, res, next) => {
     try {
-         let passedid = req.user;
-        const skillID = req.params.id;    
+        //user id taken from authentication not from url but passes in url
+        let passedid = req.user;
+        const skillID = req.params.skillid;    
         const responce = await user.validateSkill(skillID,passedid.id);
 
         if(responce === true){
@@ -175,8 +178,9 @@ userController.validateSkill = async (req, res, next) => {
 
 userController.addConnection = async (req, res, next) => {
     try {
-      let passedid = req.user;
-        const userID = req.params.id;    
+        //user id taken from authentication not from url but passes in url
+        let passedid = req.user;
+        const userID = req.params.recipientid;    
         const responce = await user.addConnection(userID,passedid.id);
 
         if(responce === true){
@@ -208,8 +212,9 @@ userController.addConnection = async (req, res, next) => {
   
 userController.respondConnection = async (req, res, next) => {
     try {
+        //user id taken from authentication not from url but passes in url
         let passedid = req.user;
-        const connectionID = req.params.id;
+        const connectionID = req.params.connectionid;
         const accept = req.body.accept;
         
         const responce = await user.respondConnection(connectionID,accept,passedid.id);
@@ -243,8 +248,9 @@ userController.respondConnection = async (req, res, next) => {
 
 userController.removeConnection = async (req, res, next) => {
     try {
+        //user id taken from authentication not from url but passes in url
         let passedid = req.user;
-        const userID = req.params.id;    
+        const userID = req.params.recipientid;    
         const responce = await user.removeConnection(userID,passedid.id);
 
         if(responce === true){
@@ -269,8 +275,9 @@ userController.removeConnection = async (req, res, next) => {
 
 userController.submitRecommendation = async (req, res, next) => {
     try {
+        //user id taken from authentication not from url but passes in url
         let passedid = req.user;
-        const userID = req.params.id;   
+        const userID = req.params.recipientid;   
         const description = req.body.description;    
         const responce = await user.submitRecommendation(userID, description,passedid.id);
 
@@ -296,6 +303,7 @@ userController.submitRecommendation = async (req, res, next) => {
 
 userController.changePassword = async (req, res, next) => {
     try {
+        //user id taken from authentication not from url but passes in url
         let passedid = req.user;
         const oldPass = req.body.oldPass;
         const newPass = req.body.newPass;
@@ -324,6 +332,7 @@ userController.changePassword = async (req, res, next) => {
 
 userController.editProfile = async (req, res, next) => {
     try {
+        //user id taken from authentication not from url but passes in url
         let passedid = req.user;
         const information = req.body;   // convert to an array 
         const responce = await user.editProfile(information,passedid.id);
