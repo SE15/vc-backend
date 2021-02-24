@@ -56,7 +56,9 @@ guestController.viewProfile = async (req, res, next) => {
 
 guestController.createAccount = async (req, res, next) => {
     try {
-        const { first_name,last_name, email, password } = req.body;
+      const first_name = req.body.firstName;
+      const last_name = req.body.lastName;
+        const { email, password } = req.body;
         const information = [{first_name,last_name, email, password}];
         const response = await guest.createAccount(information);
 
@@ -98,8 +100,9 @@ guestController.createAccount = async (req, res, next) => {
         //validate password
         //console.log(user[0]);
         let pass = user[0][0].password;
-        //console.log(pass);
-         let passw = md5(password);
+        console.log(pass);
+        let passw = md5(password);
+        console.log(passw);
         let usr = user[0][0];
         /*bcrypt.compare(passw, pass)
         .then(isMatch => {
@@ -132,11 +135,14 @@ guestController.createAccount = async (req, res, next) => {
             { expiresIn: 3600 },
             (err, token) => {
                 if(err) throw err;
+                console.log(token);
                 return res.json({
                     token,
                     user: user
                 });
+                
             })
+
             //console.log(usr.id);
           }else{
             const response = {

@@ -6,16 +6,16 @@ const userController = require('../../controllers/userController');
 
 //user routes
 router.get('/users/', authorization, userController.searchUser);
-router.get('/users/:id', authorization, userController.viewProfile);
-router.post('/users/skills/', authorization, userController.addSkill);
-router.delete('/users/skills/:id', authorization, userController.removeSkill);
-router.put('/users/skills/:id', authorization, userController.validateSkill);
-router.post('/users/connections/:id',authorization, userController.addConnection);
-router.put('/users/connections/:id',authorization, userController.respondConnection);
-router.delete('/users/connections/:id', authorization, userController.removeConnection);
-router.post('/users/recommendations/:id', authorization, userController.submitRecommendation);
-router.delete('/users/', authorization, userController.deleteAccount);
-router.put('/users/', authorization, userController.changePassword);
-router.post('/users/', authorization, userController.editProfile);
+router.get('/users/:userid', authorization, userController.viewProfile);
+router.post('/users/:userid/skills/', authorization, userController.addSkill);
+router.delete('/users/:userid/skills/:skillid', authorization, userController.removeSkill);
+router.put('/users/:userid/skills/:skillid', authorization, userController.validateSkill);
+router.post('/users/:userid/connections/:connectionid',authorization, userController.addConnection);
+router.put('/users/:userid/connections/:connectionid',authorization, userController.respondConnection);
+router.delete('/users/:userid/connections/:connectionid', authorization, userController.removeConnection);
+router.post('/users/:userid/recommendations/:reciverid', authorization, userController.submitRecommendation);
+router.delete('/users/:userid', authorization, userController.deleteAccount);
+router.put('/users/:userid', authorization, userController.changePassword);
+router.post('/users/:userid', authorization, userController.editProfile);
 
 module.exports = router;
