@@ -1,30 +1,34 @@
 const config = require('config');
 const jwt = require('jsonwebtoken');
 
-function authorization(req, res, next){
+function authorization(req, res, next) {
     const token = req.header('x-auth-token');
     //check for token
-    if(!token){
-        const response = {
-            err: 1,
-            obj: {},
-            msg: "No token, authorization denied"
+    if (!token) {
+        if ('guestAllowed' in req) {
+            return next();
+        } else {
+            const response = {
+                err: 1,
+                obj: {},
+                msg: "No token, authorization denied"
+            }
+            return res.json(response);
         }
-        return res.json(response);
     }
 
-    try{
+    try {
         //verify token
         console.log(token);
         const decoded = jwt.verify(token, config.get('jwtSecret'));
-        if(!decoded){
+        if (!decoded) {
             const response = {
                 err: 1,
                 obj: {},
                 msg: "AToken verification failed"
             }
             return res.json(response);
-        }else{
+        } else {
             req.user = decoded;
             next();
         }
@@ -33,7 +37,8 @@ function authorization(req, res, next){
         //console.log(req.user.id);
         //console.log(decoded.id);
 
-    }catch(err){
+    } catch (err) {
+        console.log(err);
         const response = {
             err: 1,
             obj: {},
