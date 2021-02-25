@@ -46,14 +46,15 @@ class User{
     
     async searchUser(name){
         
-        const user=UserModel.findAll({
+        const user= await UserModel.findAll({
             attributes:['first_name','last_name','profile_pic'], raw: true,
             where:{
-                [Op.or]:[{first_name: `${name}`,is_deleted:0},{last_name: `${name}`, is_deleted:0}]
+                [Op.or]:[{first_name:{[Op.like]:`${name}%`} ,is_deleted:0},{last_name: {[Op.like]:`${name}%`}, is_deleted:0}]
                     
             }
-        });        
+        });         
         return user;
+        
         
     }
     
