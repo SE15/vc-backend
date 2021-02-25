@@ -26,6 +26,7 @@ class User{
     static async createUser(id) {
         //gets the information from the database
         let userInfo = await UserModel.findOne({where: {id: id}});
+        console.log(userInfo);
         return new User(userInfo);
     }
 
@@ -37,24 +38,25 @@ class User{
         const users=UserModel.findAll({
         attributes:['first_name','last_name','email','profile_pic'], raw: true
         })
-
+        
         return users;
           
     }
 
-
-    async searchUser(name){
     
+    async searchUser(name){
+        
         const user=UserModel.findAll({
             attributes:['first_name','last_name','profile_pic'], raw: true,
             where:{
                 [Op.or]:[{first_name: `${name}`,is_deleted:0},{last_name: `${name}`, is_deleted:0}]
                     
             }
-        });
+        });        
         return user;
-    
+        
     }
+    
 
     async deleteAccount(passedid){
 
