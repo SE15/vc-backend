@@ -5,6 +5,8 @@ const md5 = require('md5');
 const RecommendationModel = require('../models/recommendation-model');
 const SkillModel = require('../models/skill-model');
 const ConnectionModel = require('../models/connection-model');
+const ValidationModel = require('../models/validation-model');
+
 
 
 class Guest{
@@ -62,7 +64,7 @@ class Guest{
         const user=UserModel.findAll({
             attributes:['first_name','last_name','profile_pic'], raw: true,
             where:{
-                [Op.or]:[{first_name: `${name}`,is_deleted:0},{last_name: `${name}`, is_deleted:0}]
+                [Op.or]:[{first_name:{[Op.like]:`%${name}%`} ,is_deleted:0},{last_name: {[Op.like]:`%${name}%`}, is_deleted:0}]
                     
             }
         });
@@ -106,6 +108,30 @@ class Guest{
             where:
                 [{user_id:`${user_id}`}]
         });
+
+        for(const j in skills){
+            let skillid=skills[j].id;
+            let validated=await ValidationModel.findAll({
+                attributes:["validated_by"],
+                where:{
+                    skill_id:skillid
+                },raw:true
+
+                
+            });
+            let validatedby_arr=[];
+
+            for (const k in validated){
+                let validated_id=validated[k].validated_by;
+                validatedby_arr.push(validated_id);
+            }
+            console.log(validatedby_arr)
+            var arr=validatedby_arr.toString();
+            skills[j].validated_by=arr;
+
+    }
+
+
 
         var profile=[];
         profile.push(user);
@@ -287,8 +313,8 @@ class Guest{
 }
 
 module.exports=Guest;
-//guest1 = new Guest();
-//guest1.searchUser("Lahiru").then(result => console.log('Connection Added: ', result));
+guest1 = new Guest();
+guest1.searchUser("k").then(result => console.log('Connection Added: ', result));
 //guest1.createAccount([{first_name: "Lahiru" ,last_name: "Madhushan", email:'lahiru1@gmail.com', password:'abc'}]).then(result => console.log('Account Creation: ', result));
 //guest1.viewProfile(2).then(result => console.log('Profile Status: ', result));
 //guest1.getUser("sanga@gmail.com").then(result => console.log('Connection Added: ', result));

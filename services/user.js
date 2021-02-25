@@ -4,6 +4,8 @@ const UserModel=require('../models/user-model');
 const SkillModel=require('../models/skill-model');
 const ConnectionModel=require('../models/connection-model');
 const RecommendationModel=require('../models/recommendation-model');
+const ValidationModel=require('../models/validation-model');
+
 const sequelize=require('../config/database');
 const { raw } = require('express');
 const { or } = require('sequelize');
@@ -44,11 +46,10 @@ class User{
 
 
     async searchUser(name){
-    
         const user=UserModel.findAll({
             attributes:['first_name','last_name','profile_pic'], raw: true,
             where:{
-                [Op.or]:[{first_name: `${name}`,is_deleted:0},{last_name: `${name}`, is_deleted:0}]
+                [Op.or]:[{first_name:{[Op.like]:`%${name}%`} ,is_deleted:0},{last_name: {[Op.like]:`%${name}%`}, is_deleted:0}]
                     
             }
         });
@@ -376,10 +377,34 @@ class User{
         }
     
         const skills=await SkillModel.findAll({
-            attributes:['name','validations'], raw: true,
+            attributes:['id','name','validations'], raw: true,
             where:
-                [{user_id:`${user_id}`}]
+                [{user_id:`${user_id}`}],
         });
+
+        
+        for(const j in skills){
+                let skillid=skills[j].id;
+                let validated=await ValidationModel.findAll({
+                    attributes:["validated_by"],
+                    where:{
+                        skill_id:skillid
+                    },raw:true
+
+                    
+                });
+                let validatedby_arr=[];
+
+                for (const k in validated){
+                    let validated_id=validated[k].validated_by;
+                    validatedby_arr.push(validated_id);
+                }
+                console.log(validatedby_arr)
+                var arr=validatedby_arr.toString();
+                skills[j].validated_by=arr;
+
+        }
+
 
         var profile=[];
         profile.push(user);
@@ -437,7 +462,6 @@ class User{
         
         profile.push(names);
 
-        //console.log(connections);
         //return records;
         //return user;
         //return mergeduser;
@@ -450,7 +474,7 @@ class User{
     
 }
 module.exports = User;
-//user1=new User();
+user1=new User();
 //user1.addConnection(11).then(result => console.log('Connection Added: ', result));
 //user1.removeConnection(11).then(result => console.log('Connection Removed: ', result));
 //user1.respondConnection(32,true).then(result => console.log('Connection state updated: ', result));
@@ -469,4 +493,4 @@ module.exports = User;
 //user1.viewEvent(1).then(result=>console.log("Event Details: ",result));
 //user1.viewEvent(1).then(result=>console.log("Event Details: ",result));
 
-//user1.searchUser("Lahiru").then(result=>console.log("Search Details: ",result));
+user1.searchUser("m").then(result=>console.log("Search Details: ",result));
