@@ -1,5 +1,5 @@
 const User = require('../services/user.js');
-const Guest = require('../services/user.js');
+const Guest = require('../services/guest.js');
 
 // Instantiate User:
 let user = new User();
