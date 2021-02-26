@@ -1,5 +1,6 @@
 const config = require('config');
 const jwt = require('jsonwebtoken');
+const { errorMessage } = require("../utils/message-template");
 
 function authorization(req, res, next) {
     const token = req.header('x-auth-token');
@@ -8,12 +9,7 @@ function authorization(req, res, next) {
         if ('guestAllowed' in req) {
             return next();
         } else {
-            const response = {
-                err: 1,
-                obj: {},
-                msg: "No token, authorization denied"
-            }
-            return res.json(response);
+            return errorMessage(res, "No token, authorization denied", 401);
         }
     }
 
@@ -22,12 +18,7 @@ function authorization(req, res, next) {
         console.log(token);
         const decoded = jwt.verify(token, config.get('jwtSecret'));
         if (!decoded) {
-            const response = {
-                err: 1,
-                obj: {},
-                msg: "AToken verification failed"
-            }
-            return res.json(response);
+            return errorMessage(res, "AToken verification failed", 401);
         } else {
             req.user = decoded;
             next();
@@ -39,12 +30,7 @@ function authorization(req, res, next) {
 
     } catch (err) {
         console.log(err);
-        const response = {
-            err: 1,
-            obj: {},
-            msg: "Access denied, no session"
-        }
-        return res.json(response);
+        return errorMessage(res, "Access denied, no session", 401);
     }
 }
 

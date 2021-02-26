@@ -1,5 +1,7 @@
+const { errorMessage } = require("../utils/message-template");
+
 const unknownEndpoint = (req, res) => {
-    return res.status(404).json({ error: "Unknown endpoint" });
+    return errorMessage(res, "Unknown endpoint");
 }
 
 module.exports = unknownEndpoint;

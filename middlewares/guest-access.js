@@ -1,11 +1,9 @@
+const { errorMessage } = require("../utils/message-template");
+
 const guestAccess = (req, res, next) => {
+
     if ('guestAllowed' in req) {
-        const response = {
-            err: 1,
-            obj: {},
-            msg: "Access denied"
-        }
-        return res.json(response);
+        return errorMessage(res, "Access denied", 403);
     }
     
     req.guestAllowed = true;
