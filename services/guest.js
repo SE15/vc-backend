@@ -5,6 +5,7 @@ const md5 = require('md5');
 const RecommendationModel = require('../models/recommendation-model');
 const SkillModel = require('../models/skill-model');
 const ConnectionModel = require('../models/connection-model');
+const { login } = require('../controllers/auth-controller');
 
 
 class Guest{
@@ -175,12 +176,14 @@ class Guest{
 
         const login_id = await UserModel.findOne({
             arrtibute:["id"],
-            where:{
-                email:email
+            where:{[Op.and]:
+                [{email:email,is_deleted:0}]
+                    
             },raw:true
         });
 
-        
+        if (login_id === null) throw new Error('Invalid email or password');
+
         let user_id= login_id.id;
        
         const user=await UserModel.findAll({
