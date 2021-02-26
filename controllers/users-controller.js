@@ -12,9 +12,9 @@ const searchUser = async (req, res, next) => {
     //console.log("usr");
     //let ff = req.user;
     //console.log(ff.id);
-    const keyword = req.query.keyword;  
+    const keyword = req.query.keyword;
 
-    const users = (req.user) ? await user.searchUser(keyword) :  await guest.searchUser(keyword);
+    const users = (req.user) ? await user.searchUser(keyword) : await guest.searchUser(keyword);
 
     if (users.length) {
       return successMessage(res, users, "Users found");
@@ -29,7 +29,7 @@ const searchUser = async (req, res, next) => {
 const viewProfile = async (req, res, next) => {
   try {
     const userID = req.params.userid;
-    
+
     const profile = (req.user) ? await user.viewProfile(userID) : await guest.viewProfile(userID);
 
     return successMessage(res, profile, "User found");
@@ -61,16 +61,7 @@ const changePassword = async (req, res, next) => {
   try {
     //user id taken from authentication not from url but passes in url
     let passedid = req.user;
-    const oldPass = req.body.oldPass;
-    const newPass = req.body.newPass;
 
-    const responce = await user.changePassword(oldPass, newPass, passedid.id);
-
-    if (responce === true) {
-      return successMessage(res, true, "Successfully changed the password");
-    } else {
-      return errorMessage(res, "Unable to change the password", 500);
-    }
   } catch (err) {
     next(err);
   }
@@ -80,15 +71,33 @@ const editProfile = async (req, res, next) => {
   try {
     //user id taken from authentication not from url but passes in url
     let passedid = req.user;
-    const information = req.body;   // convert to an array 
-    const responce = await user.editProfile(information, passedid.id);
+    let response;
 
-    if (responce === true) {
-      return successMessage(res, true, "Successfully updated the profile");
-    } else {
-      return errorMessage(res, "Unable to update the profile", 500);
+    const method = red.body.method;
+    switch (method) {
+      case 'edit-info':
+        const information = req.body;   // convert to an array 
+        responce = await user.editProfile(information, passedid.id);
+
+        if (responce === true) {
+          return successMessage(res, true, "Successfully updated the profile");
+        } else {
+          return errorMessage(res, "Unable to update the profile", 500);
+        }
+      case 'change-password':
+        const oldPass = req.body.oldPass;
+        const newPass = req.body.newPass;
+
+        responce = await user.changePassword(oldPass, newPass, passedid.id);
+
+        if (responce === true) {
+          return successMessage(res, true, "Successfully changed the password");
+        } else {
+          return errorMessage(res, "Unable to change the password", 500);
+        }
+      default:
+        return errorMessage(res, "Invalid method");
     }
-
   } catch (err) {
     next(err);
   }
