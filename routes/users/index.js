@@ -11,7 +11,8 @@ routes.use('/:userid/skills', require('./skills'));
 routes.get('/', guestAccess, authorization, searchUser);
 routes.post('/', createAccount);
 
-routes.get('/:userid', guestAccess, authorization, viewProfile);
+routes.get('/:userid',  viewProfile);
+//routes.get('/:userid', guestAccess, authorization, viewProfile);
 routes.delete('/:userid', authorization, deleteAccount);
 routes.put('/:userid', authorization, changePassword);
 routes.post('/:userid', authorization, editProfile);
