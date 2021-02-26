@@ -8,12 +8,12 @@ const addSkill = async (req, res, next) => {
         let passedid = req.user;
         const name = req.body.name;
 
-        const responce = await User.addSkill(name, passedid.id);
+        const response = await User.addSkill(name, passedid.id);
 
 
-        if (responce === true) {
+        if (response === true) {
             return successMessage(res, true, "Successfully added the skill");
-        } else if (responce == "added") {
+        } else if (response == "added") {
             return errorMessage(res, "This has already added");
         } else {
             return errorMessage(res, "Unable to add the skill", 500);
@@ -27,9 +27,9 @@ const removeSkill = async (req, res, next) => {
     try {
         //userid passes from url but do not pass to services
         const skillID = req.params.skillid;
-        const responce = await user.removeSkill(skillID);
+        const response = await user.removeSkill(skillID);
 
-        if (responce === true) {
+        if (response === true) {
             return successMessage(res, true,"You have succesfully deleted this skill");
         } else {
             return errorMessage(res, "Unable to delete the message", 500);
@@ -44,11 +44,11 @@ const validateSkill = async (req, res, next) => {
         //user id taken from authentication not from url but passes in url
         let passedid = req.user;
         const skillID = req.params.skillid;
-        const responce = await user.validateSkill(skillID, passedid.id);
+        const response = await user.validateSkill(skillID, passedid.id);
 
-        if (responce === true) {
+        if (response === true) {
             return successMessage(res, true, "You have validated the skill");
-        } else if (responce == "validated") {
+        } else if (response == "validated") {
             return errorMessage(res, "You have already validated the skill");
         } else {
             return errorMessage(res, "Unable to validate the skill");
