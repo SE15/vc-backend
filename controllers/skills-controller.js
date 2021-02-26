@@ -1,5 +1,6 @@
 const User = require('../services/user.js');
 let user = new User();
+const { successMessage, errorMessage } = require("../utils/message-template");
 
 const addSkill = async (req, res, next) => {
     try {
@@ -11,26 +12,11 @@ const addSkill = async (req, res, next) => {
 
 
         if (responce === true) {
-            const response = {
-                err: 0,
-                obj: true,
-                msg: "Successfully added the skill"
-            }
-            return res.json(response);
+            return successMessage(res, true, "Successfully added the skill");
         } else if (responce == "added") {
-            const response = {
-                err: 0,
-                obj: {},
-                msg: "This skill has already added"
-            }
-            return res.json(response);
+            return errorMessage(res, "This has already added");
         } else {
-            const response = {
-                err: 1,
-                obj: {},
-                msg: "Something is wrong"
-            }
-            return res.json(response);
+            return errorMessage(res, "Unable to add the skill", 500);
         }
     } catch (err) {
         next(err);
@@ -44,19 +30,9 @@ const removeSkill = async (req, res, next) => {
         const responce = await user.removeSkill(skillID);
 
         if (responce === true) {
-            const response = {
-                err: 0,
-                obj: true,
-                msg: "You have succesfully deleted this skill"
-            }
-            return res.json(response);
+            return successMessage(res, true,"You have succesfully deleted this skill");
         } else {
-            const response = {
-                err: 1,
-                obj: {},
-                msg: "Something is wrong"
-            }
-            return res.json(response);
+            return errorMessage(res, "Unable to delete the message", 500);
         }
     } catch (err) {
         next(err);
@@ -71,26 +47,11 @@ const validateSkill = async (req, res, next) => {
         const responce = await user.validateSkill(skillID, passedid.id);
 
         if (responce === true) {
-            const response = {
-                err: 0,
-                obj: true,
-                msg: "You have validated the skill"
-            }
-            return res.json(response);
+            return successMessage(res, true, "You have validated the skill");
         } else if (responce == "validated") {
-            const response = {
-                err: 0,
-                obj: false,
-                msg: "You have already validated the skill"
-            }
-            return res.json(response);
+            return errorMessage(res, "You have already validated the skill");
         } else {
-            const response = {
-                err: 1,
-                obj: {},
-                msg: "Something is wrong"
-            }
-            return res.json(response);
+            return errorMessage(res, "Unable to validate the skill");
         }
     } catch (err) {
         next(err);

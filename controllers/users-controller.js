@@ -1,5 +1,6 @@
 const User = require('../services/user.js');
 const Guest = require('../services/guest.js');
+const { successMessage, errorMessage } = require("../utils/message-template");
 
 // Instantiate User:
 let user = new User();
@@ -16,22 +17,10 @@ const searchUser = async (req, res, next) => {
     const users = (req.user) ? await user.searchUser(keyword) :  await guest.searchUser(keyword);
 
     if (users.length) {
-      const response = {
-        err: 0,
-        obj: users,
-        msg: ""
-      }
-
-      return res.json(response);
+      return successMessage(res, users, "Users found");
     } else {
-      const response = {
-        err: 1,
-        obj: {},
-        msg: "No result found"
-      }
-      return res.json(response);
+      return errorMessage(res, "No results found");
     }
-
   } catch (err) {
     next(err);
   }
@@ -41,15 +30,10 @@ const viewProfile = async (req, res, next) => {
   try {
     const userID = req.params.userid;
     
-    if (req.user) {const profile = await user.viewProfile(userID);}
-    else {const profile = await guest.viewProfile(userID);}
+    const profile = (req.user) ? await user.viewProfile(userID) : await guest.viewProfile(userID);
 
-    const response = {
-      err: 0,
-      obj: profile,
-      msg: ""
-    }
-    return res.json(response);
+    return successMessage(res, profile, "User found");
+
   } catch (err) {
     next(err);
   }
@@ -63,19 +47,9 @@ const deleteAccount = async (req, res, next) => {
     const responce = await user.deleteAccount(passedid.id);
 
     if (responce === true) {
-      const response = {
-        err: 0,
-        obj: true,
-        msg: "User successfully deleted"
-      }
-      return res.json(response);
+      return successMessage(res, true, "User successfully deleted");
     } else {
-      const response = {
-        err: 1,
-        obj: {},
-        msg: "Something is wrong"
-      }
-      return res.json(response);
+      return errorMessage(res, "Unable to delete the account", 500);
     }
   } catch (err) {
     next(err);
@@ -93,19 +67,9 @@ const changePassword = async (req, res, next) => {
     const responce = await user.changePassword(oldPass, newPass, passedid.id);
 
     if (responce === true) {
-      const response = {
-        err: 0,
-        obj: true,
-        msg: "Successfully changed the password"
-      }
-      return res.json(response);
+      return successMessage(res, true, "Successfully changed the password");
     } else {
-      const response = {
-        err: 1,
-        obj: {},
-        msg: "Something is wrong"
-      }
-      return res.json(response);
+      return errorMessage(res, "Unable to change the password", 500);
     }
   } catch (err) {
     next(err);
@@ -120,19 +84,9 @@ const editProfile = async (req, res, next) => {
     const responce = await user.editProfile(information, passedid.id);
 
     if (responce === true) {
-      const response = {
-        err: 0,
-        obj: true,
-        msg: "Profile updated"
-      }
-      return res.json(response);
+      return successMessage(res, true, "Successfully updated the profile");
     } else {
-      const response = {
-        err: 1,
-        obj: {},
-        msg: "Something is wrong"
-      }
-      return res.json(response);
+      return errorMessage(res, "Unable to update the profile", 500);
     }
 
   } catch (err) {
@@ -149,26 +103,11 @@ const createAccount = async (req, res, next) => {
     const response = await guest.createAccount(information);
 
     if (response === true) {
-      const response = {
-        err: 0,
-        obj: true,
-        msg: "User successfully registered"
-      }
-      return res.json(response);
+      return successMessage(res, true, "User successfully registered");
     } else if (response === false) {
-      const response = {
-        err: 0,
-        obj: false,
-        msg: "User already exists"
-      }
-      return res.json(response);
+      return errorMessage(res, "User already exists");
     } else {
-      const response = {
-        err: 0,
-        obj: {},
-        msg: "Something is wrong"
-      }
-      return res.json(response);
+      return errorMessage(res, "Unable to create an account", 500);
     }
 
   } catch (err) {

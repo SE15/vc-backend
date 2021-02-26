@@ -1,5 +1,6 @@
 const User = require('../services/user.js');
 let user = new User();
+const { successMessage, errorMessage } = require("../utils/message-template");
 
 const addConnection = async (req, res, next) => {
     try {
@@ -9,26 +10,11 @@ const addConnection = async (req, res, next) => {
         const responce = await user.addConnection(userID, passedid.id);
 
         if (responce === true) {
-            const response = {
-                err: 0,
-                obj: true,
-                msg: "Request sent"
-            }
-            return res.json(response);
+            return successMessage(res, true, 'Requeest sent to the user');
         } else if (responce == "sent") {
-            const response = {
-                err: 0,
-                obj: false,
-                msg: "Request already sent"
-            }
-            return res.json(response);
+            return errorMessage(res, "Request already sent to the user")
         } else {
-            const response = {
-                err: 1,
-                obj: {},
-                msg: "Something is wrong"
-            }
-            return res.json(response);
+            return errorMessage(res, "Unable to add the connection", 500);
         }
     } catch (err) {
         next(err);
@@ -45,26 +31,11 @@ const respondConnection = async (req, res, next) => {
         const responce = await user.respondConnection(recipientid, accept, passedid.id);
 
         if (responce === true) {
-            const response = {
-                err: 0,
-                obj: true,
-                msg: "You have accepted the connection"
-            }
-            return res.json(response);
+            return successMessage(res, true, "You have accepted the connection");
         } else if (responce === false) {
-            const response = {
-                err: 0,
-                obj: false,
-                msg: "You have rejected the connection"
-            }
-            return res.json(response);
+            return successMessage(res, true, "You have rejected the connection");
         } else {
-            const response = {
-                err: 1,
-                obj: {},
-                msg: "Something is wrong"
-            }
-            return res.json(response);
+            return errorMessage(res, "Unable to respond to connection", 500);
         }
     } catch (err) {
         next(err);
@@ -79,19 +50,9 @@ const removeConnection = async (req, res, next) => {
         const responce = await user.removeConnection(userID, passedid.id);
 
         if (responce === true) {
-            const response = {
-                err: 0,
-                obj: true,
-                msg: "Connection removed successfully"
-            }
-            return res.json(response);
+            return successMessage(res, true, "Connection removed successfully");
         } else {
-            const response = {
-                err: 1,
-                obj: {},
-                msg: "Something is wrong"
-            }
-            return res.json(response);
+            return errorMessage(res, "Unable to remove the connection", 500);
         }
     } catch (err) {
         next(err);

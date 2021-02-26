@@ -1,5 +1,6 @@
 const User = require('../services/user.js');
 let user = new User();
+const { successMessage, errorMessage } = require("../utils/message-template");
 
 const submitRecommendation = async (req, res, next) => {
     try {
@@ -10,19 +11,9 @@ const submitRecommendation = async (req, res, next) => {
         const responce = await user.submitRecommendation(userID, description, passedid.id);
 
         if (responce === true) {
-            const response = {
-                err: 0,
-                obj: true,
-                msg: "You have submitted the recommendation"
-            }
-            return res.json(response);
+            return successMessage(res, true, "You have submitted the recommendation");
         } else {
-            const response = {
-                err: 1,
-                obj: {},
-                msg: "Something is wrong"
-            }
-            return res.json(response);
+            return errorMessage(res, "Unable to submit the recommendation", 500);
         }
     } catch (err) {
         next(err);
