@@ -106,10 +106,10 @@ class User{
     async changePassword(oldPassword,newPassword,passedid){
         //temp data
         this.user_id=passedid;
-        
+
         let result = await UserModel.findOne({where: {id: this.user_id}});
-        let hashPassword = result.password;
-        let updatePassword = md5(newPassword);
+        let hashPassword = result.password;                              
+        let updatePassword = md5(newPassword);                
         if(hashPassword === md5(oldPassword)){
             await UserModel.update({ 
                     
