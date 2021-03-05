@@ -15,7 +15,7 @@ const login = async (req, res, next) => {
         try {
             user = await guest.getUser(email);
         } catch (e) {
-            return errorMessage(res, 'Invalid email or password');
+            return errorMessage(res, 'Invalid email or password', 401);
         }
         
         let pass = user[0][0].password;
@@ -49,14 +49,11 @@ const login = async (req, res, next) => {
         });
 */    if (pass === passw) {
             jwt.sign(
-                { id: usr.id },
+                { userID: usr.id, expiresIn: 3600 },
                 config.get('jwtSecret'),
-                { expiresIn: 3600 },
                 (err, token) => {
                     if (err) throw err;
-                    console.log(token);
-                    return successMessage(res, {token: token, user: user})
-
+                    return successMessage(res, {token})
                 })
         } else {
             return errorMessage(res, "Invalid email or password", 401);
