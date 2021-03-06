@@ -14,7 +14,24 @@ const searchUser = async (req, res, next) => {
     //console.log(ff.id);
     const keyword = req.query.keyword;
 
-    const users = (req.user) ? await user.searchUser(keyword) : await guest.searchUser(keyword);
+    let users = [];
+    if (keyword.indexOf(' ') >= 0) {
+      const keywords = keyword.split(' ');
+      for (const key of keywords) {
+        const results = (req.user) ? await user.searchUser(key) : await guest.searchUser(key);
+        users = [...users, ...results];
+      }
+      users = users.filter((user,ind) => {
+        let tempUsers = [...users];
+        tempUsers.splice(ind);
+        for (const u of tempUsers) {
+          if (u.id === user.id) return false;
+        }
+        return true;
+      })
+    } else {
+      users = (req.user) ? await user.searchUser(keyword) : await guest.searchUser(keyword);
+    }
 
     if (users.length) {
       return successMessage(res, users, "Users found");
@@ -33,7 +50,7 @@ const viewProfile = async (req, res, next) => {
     const profile = (req.user) ? await user.viewProfile(userID) : await guest.viewProfile(userID);
     let output = profile[0][0];
     output.skills = profile[1];
-    output.recommendations= profile[2];
+    output.recommendations = profile[2];
     output.connections = profile[3]
 
     return successMessage(res, output, "User found");

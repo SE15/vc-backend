@@ -46,9 +46,9 @@ class User{
     async searchUser(name){
     
         const user=UserModel.findAll({
-            attributes:['first_name','last_name','profile_pic'], raw: true,
+            attributes:['id','first_name','last_name','profile_pic'], raw: true,
             where:{
-                [Op.or]:[{first_name: `${name}`,is_deleted:0},{last_name: `${name}`, is_deleted:0}]
+                [Op.or]:[{first_name: {[Op.substring]: name},is_deleted:0},{last_name: {[Op.substring]: name}, is_deleted:0}]
                     
             }
         });
@@ -472,19 +472,33 @@ class User{
 
     async getConnectionState(requesterId, recipientId){
         let cnt1 = await ConnectionModel.count({where: {
-            [Op.and]: [
-                { recipient_id: recipientId },
-                { requester_id: requesterId },
-                { state:'pending'}
-            ] 
+            [Op.or]: [
+                {[Op.and]: [
+                    { recipient_id: recipientId },
+                    { requester_id: requesterId },
+                    { state:'pending'}
+                ]}, 
+               {[Op.and]: [
+                    { recipient_id: requesterId },
+                    { requester_id: recipientId },
+                    { state:'pending'}
+                ]}
+            ]
         }})
 
         let cnt2 = await ConnectionModel.count({where: {
-            [Op.and]: [
-                { recipient_id: recipientId },
-                { requester_id: requesterId },
-                { state:'accepted'}
-            ] 
+            [Op.or]: [
+                {[Op.and]: [
+                    { recipient_id: recipientId },
+                    { requester_id: requesterId },
+                    { state:'accepted'}
+                ]}, 
+               {[Op.and]: [
+                    { recipient_id: requesterId },
+                    { requester_id: recipientId },
+                    { state:'accepted'}
+                ]}
+            ]
         }})
 
         let message;
@@ -496,9 +510,8 @@ class User{
              message =  "accepted";
         }        
         else{
-            message = "doesn't exists"
-        }
-        
+            message = "none"
+        }   
         return message;
     }
 

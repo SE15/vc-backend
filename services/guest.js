@@ -61,9 +61,9 @@ class Guest{
     async searchUser(name){
     
         const user=UserModel.findAll({
-            attributes:['first_name','last_name','profile_pic'], raw: true,
+            attributes:['id','first_name','last_name','profile_pic'], raw: true,
             where:{
-                [Op.or]:[{first_name: `${name}`,is_deleted:0},{last_name: `${name}`, is_deleted:0}]
+                [Op.or]:[{first_name: {[Op.substring]: name},is_deleted:0},{last_name: {[Op.substring]: name}, is_deleted:0}]
                     
             }
         });
@@ -103,7 +103,7 @@ class Guest{
         }
     
         const skills=await SkillModel.findAll({
-            attributes:['name','validations'], raw: true,
+            attributes:['id','name','validations'], raw: true,
             where:
                 [{user_id:`${user_id}`}]
         });
@@ -134,9 +134,9 @@ class Guest{
            // console.log(con_id);
             
             let name=await UserModel.findOne({
-                attributes:["first_name","last_name"],
+                attributes:["id","first_name","last_name"],
                 where:{
-                    id:con_id
+                    id:con_id                    
                 },raw:true
             });
             //Object.assign({},name);
@@ -150,7 +150,7 @@ class Guest{
            // console.log(con_id);
             
             let name=await UserModel.findOne({
-                attributes:["first_name","last_name"],
+                attributes:["id","first_name","last_name"],
                 where:{
                     id:con_id
                 },raw:true

@@ -7,7 +7,7 @@ const { addConnection, respondConnection, removeConnection, getConnectionRequest
 router.get('/', authorization, getConnectionRequests);
 router.post('/',authorization, addConnection);
 
-router.get('/recipientid', authorization, getConnectionStatus);
+router.get('/:recipientid', authorization, getConnectionStatus);
 router.put('/:recipientid',authorization, respondConnection);
 router.delete('/:recipientid', authorization, removeConnection);
 
