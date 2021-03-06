@@ -458,7 +458,7 @@ class User{
             let con_id=connections[y].requester_id;
            
             let name=await UserModel.findOne({
-                attributes:["first_name","last_name"],
+                attributes:["id", "first_name","last_name"],
                 where:{
                     id:con_id
                 },raw:true

@@ -3,35 +3,31 @@ const jwt = require('jsonwebtoken');
 const { errorMessage } = require("../utils/message-template");
 
 function authorization(req, res, next) {
-    const token = req.header('x-auth-token');
-    //check for token
-    if (!token) {
+    const authHeader = req.get('Authorization');      //token set to auth header by client
+    if (!authHeader) {
         if ('guestAllowed' in req) {
             return next();
         } else {
-            return errorMessage(res, "No token, authorization denied", 401);
+            return errorMessage(res, "No token, authentication failed", 401);
         }
     }
 
+    const token = authHeader.split(' ')[1]; //'Bearer token'-->['Bearer','token']-->'token'    
+    let decodedToken;
     try {
-        //verify token
-        console.log(token);
-        const decoded = jwt.verify(token, config.get('jwtSecret'));
-        if (!decoded) {
-            return errorMessage(res, "AToken verification failed", 401);
-        } else {
-            req.user = decoded;
-            next();
-        }
-        //add user from payload
-        //req.user = decoded;
-        //console.log(req.user.id);
-        //console.log(decoded.id);
-
-    } catch (err) {
-        console.log(err);
-        return errorMessage(res, "Access denied, no session", 401);
+        decodedToken = jwt.verify(token, config.get('jwtSecret'));
     }
+
+    catch (err) {
+        errorMessage(res, "Something went wrong", 500);
+    }
+
+    if (!decodedToken) {
+        return errorMessage(res, "Not authenticated.", 401);
+    }
+
+    req.user = decodedToken.userID;
+    next();
 }
 
 module.exports = authorization;
