@@ -376,7 +376,7 @@ class User{
         }
     
         const skills=await SkillModel.findAll({
-            attributes:['name','validations'], raw: true,
+            attributes:['id','name','validations'], raw: true,
             where:
                 [{user_id:`${user_id}`}]
         });
@@ -407,9 +407,9 @@ class User{
            // console.log(con_id);
             
             let name=await UserModel.findOne({
-                attributes:["first_name","last_name"],
+                attributes:["id","first_name","last_name"],
                 where:{
-                    id:con_id
+                    id:con_id                    
                 },raw:true
             });
             //Object.assign({},name);
@@ -423,7 +423,7 @@ class User{
            // console.log(con_id);
             
             let name=await UserModel.findOne({
-                attributes:["first_name","last_name"],
+                attributes:["id","first_name","last_name"],
                 where:{
                     id:con_id
                 },raw:true
@@ -502,35 +502,7 @@ class User{
         return message;
     }
 
-    async getConnectedId(currentUserId){
-        let connections1 = await ConnectionModel.findAll({
-            attributes:["requester_id"],
-            where:{[Op.and]:[{
-                recipient_id:currentUserId
-            },{state:"accepted"}]
-        },raw:true});
-
-        let connections2 = await ConnectionModel.findAll({
-            attributes:["recipient_id"],
-            where:{[Op.and]:[{
-                requester_id:currentUserId
-            },{state:"accepted"}]
-        },raw:true});
-        
-        var ids=[];
-        for (const y in connections1){
-            let con_id=connections1[y].requester_id;
-            ids.push(con_id);
-
-        }
-
-        for (const y in connections2){
-            let con_id=connections2[y].recipient_id;
-            ids.push(con_id);
-
-        }
-        return ids;
-    }
+    
 
     
 }
