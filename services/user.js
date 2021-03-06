@@ -444,8 +444,93 @@ class User{
         return profile;
     }
 
+    async viewRequests(recipientId){
+        let connections = await ConnectionModel.findAll({
+            attributes:["requester_id"],
+            where:{[Op.and]:[{
+                recipient_id:recipientId
+            },{state:"pending"}]
+        },raw:true});
+        
+        var requests=[];
 
+        for (const y in connections){
+            let con_id=connections[y].requester_id;
+           
+            let name=await UserModel.findOne({
+                attributes:["first_name","last_name"],
+                where:{
+                    id:con_id
+                },raw:true
+            });
+            
+            requests.push(name);
 
+        }
+        return requests;
+    }
+
+    async getConnectionState(requesterId, recipientId){
+        let cnt1 = await ConnectionModel.count({where: {
+            [Op.and]: [
+                { recipient_id: recipientId },
+                { requester_id: requesterId },
+                { state:'pending'}
+            ] 
+        }})
+
+        let cnt2 = await ConnectionModel.count({where: {
+            [Op.and]: [
+                { recipient_id: recipientId },
+                { requester_id: requesterId },
+                { state:'accepted'}
+            ] 
+        }})
+
+        let message;
+
+        if(cnt1!=0){
+            message= "pending";
+        }
+        else if(cnt2!=0){
+             message =  "accepted";
+        }        
+        else{
+            message = "doesn't exists"
+        }
+        
+        return message;
+    }
+
+    async getConnectedId(currentUserId){
+        let connections1 = await ConnectionModel.findAll({
+            attributes:["requester_id"],
+            where:{[Op.and]:[{
+                recipient_id:currentUserId
+            },{state:"accepted"}]
+        },raw:true});
+
+        let connections2 = await ConnectionModel.findAll({
+            attributes:["recipient_id"],
+            where:{[Op.and]:[{
+                requester_id:currentUserId
+            },{state:"accepted"}]
+        },raw:true});
+        
+        var ids=[];
+        for (const y in connections1){
+            let con_id=connections1[y].requester_id;
+            ids.push(con_id);
+
+        }
+
+        for (const y in connections2){
+            let con_id=connections2[y].recipient_id;
+            ids.push(con_id);
+
+        }
+        return ids;
+    }
 
     
 }
@@ -470,3 +555,6 @@ module.exports = User;
 //user1.viewEvent(1).then(result=>console.log("Event Details: ",result));
 
 //user1.searchUser("Lahiru").then(result=>console.log("Search Details: ",result));
+//user1.viewRequests(2).then(result=>console.log("Requests: ",result));
+//user1.getConnectionState(33,21).then(result=>console.log("State: ",result));
+//user1.getConnectedId(21).then(result=>console.log("ID: ",result));
