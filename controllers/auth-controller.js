@@ -23,33 +23,11 @@ const login = async (req, res, next) => {
         let passw = md5(password);
         console.log(passw);
         let usr = user[0][0];
-        /*bcrypt.compare(passw, pass)
-        .then(isMatch => {
-            if(!isMatch){
-                const response = {
-                    err: 1,
-                    obj: {},
-                    msg: "Invalid password"
-                  }
-                  return res.json(response);
-            }
-            
+        console.log(usr);
+
+        if (pass === passw) {
             jwt.sign(
-                {id: user.id},
-                config.get('jwtSecret'),
-                { expiresIn: 3600 },
-                (err, token) => {
-                    if(err) throw err;
-                    return res.json({
-                        token,
-                        user: user
-                    });
-                }
-            )
-        });
-*/    if (pass === passw) {
-            jwt.sign(
-                { userID: usr.id, expiresIn: 3600 },
+                { userID: usr.id, expiresIn: 3600, firstName: first_name, lastName: last_name, profilePic: profile_pic },
                 config.get('jwtSecret'),
                 (err, token) => {
                     if (err) throw err;
