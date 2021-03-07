@@ -14,17 +14,19 @@ class Connection {
         //adding a new connection to the database
         
         if (isNew == true) { 
+            
             await ConnectionModel.create({ 
                 requester_id: this.requester_id,
                 recipient_id: this.recipient_id,
                 state:"pending"}, { transaction: t });
+                   
             let result = await ConnectionModel.findOne({where: {
                 [Op.and]: [
                     { requester_id: this.requester_id },
                     { recipient_id: this.recipient_id }
-            ]}}, { transaction: t });
-            
-            this.state = result.state;    
+            ]}}, { transaction: t });                        
+            this.state = result.state; 
+                          
         return true; 
         
         
@@ -32,6 +34,7 @@ class Connection {
     }
 
     async destroy() {
+        try{
         await ConnectionModel.destroy({where: {
             [Op.and]: [
                 {requester_id: this.requester_id},
@@ -39,6 +42,9 @@ class Connection {
                 
             ]}});
         return true;
+        }catch(e){
+            return false;
+        }
     }
 
     static async create(recipient_id,reque_id) {
@@ -73,7 +79,7 @@ class Connection {
                 { requester_id: reque_id },
                 { state:'pending'}
             ] 
-        }})
+        }})                
         let cnt2 = await ConnectionModel.count({where: {
             [Op.and]: [
                 { requester_id: recipient_id },
@@ -81,7 +87,6 @@ class Connection {
                 { state:'pending'}
             ] 
         }})
-        
         
         if (cnt1 === 0 && cnt2===0) {
                 
@@ -91,11 +96,12 @@ class Connection {
                 throw err;
             }
         } else {
-            if(cnt1!=0){
-                return false;
-            }else{
-                return false;
-            }
+            return false;
+            //if(cnt1!=0){
+              //  return false;
+            //}else{
+              //  return false;
+            //}
 
                 
         }

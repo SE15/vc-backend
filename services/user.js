@@ -234,8 +234,7 @@ class User{
         let reque_id=this.requester_id;
         let checkin=null;
             
-        checkin = await Connection.checkValidations(recipient_id,reque_id);
-                  
+        checkin = await Connection.checkValidations(recipient_id,reque_id);                 
         try{   
         if(checkin===true){
                     
@@ -280,7 +279,7 @@ class User{
             res = await Connection.updateState(recipi_id,requester_id,accept);
             return res;
         }else{
-            return "removed one/ accepted one";
+            return "removed one/accepted one";
         }
     }
 
@@ -454,7 +453,7 @@ class User{
 }
 module.exports = User;
 //user1=new User();
-//user1.addConnection(11).then(result => console.log('Connection Added: ', result));
+//user1.addConnection(null,null).then(result => console.log('Connection Added: ', result));
 //user1.removeConnection(11).then(result => console.log('Connection Removed: ', result));
 //user1.respondConnection(32,true).then(result => console.log('Connection state updated: ', result));
 
