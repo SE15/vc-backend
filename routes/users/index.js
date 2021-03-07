@@ -8,11 +8,11 @@ routes.use('/:userid/connections', require('./connections'));
 routes.use('/:userid/recommendations', require('./recommendations'));
 routes.use('/:userid/skills', require('./skills'));
 
-routes.get('/', guestAccess, authorization, searchUser);
+routes.get('/', authorization, searchUser);
+//routes.get('/', guestAccess, authorization, searchUser);
 routes.post('/', createAccount);
 
-routes.get('/:userid', authorization, viewProfile);
-//routes.get('/:userid', guestAccess, authorization, viewProfile);
+routes.get('/:userid', viewProfile);
 routes.delete('/:userid', authorization, deleteAccount);
 routes.put('/:userid', authorization, changePassword);
 routes.post('/:userid', authorization, editProfile);

@@ -46,9 +46,9 @@ class User{
     async searchUser(name){
     
         const user=UserModel.findAll({
-            attributes:['first_name','last_name','profile_pic'], raw: true,
+            attributes:['id','first_name','last_name','profile_pic'], raw: true,
             where:{
-                [Op.or]:[{first_name: `${name}`,is_deleted:0},{last_name: `${name}`, is_deleted:0}]
+                [Op.or]:[{first_name: {[Op.substring]: name},is_deleted:0},{last_name: {[Op.substring]: name}, is_deleted:0}]
                     
             }
         });
@@ -376,7 +376,7 @@ class User{
         }
     
         const skills=await SkillModel.findAll({
-            attributes:['name','validations'], raw: true,
+            attributes:['id','name','validations'], raw: true,
             where:
                 [{user_id:`${user_id}`}]
         });
@@ -407,9 +407,9 @@ class User{
            // console.log(con_id);
             
             let name=await UserModel.findOne({
-                attributes:["first_name","last_name"],
+                attributes:["id","first_name","last_name"],
                 where:{
-                    id:con_id
+                    id:con_id                    
                 },raw:true
             });
             //Object.assign({},name);
@@ -423,7 +423,7 @@ class User{
            // console.log(con_id);
             
             let name=await UserModel.findOne({
-                attributes:["first_name","last_name"],
+                attributes:["id","first_name","last_name"],
                 where:{
                     id:con_id
                 },raw:true
@@ -444,8 +444,78 @@ class User{
         return profile;
     }
 
+    async viewRequests(recipientId){
+        let connections = await ConnectionModel.findAll({
+            attributes:["requester_id"],
+            where:{[Op.and]:[{
+                recipient_id:recipientId
+            },{state:"pending"}]
+        },raw:true});
+        
+        var requests=[];
 
+        for (const y in connections){
+            let con_id=connections[y].requester_id;
+           
+            let name=await UserModel.findOne({
+                attributes:["id", "first_name","last_name"],
+                where:{
+                    id:con_id
+                },raw:true
+            });
+            
+            requests.push(name);
 
+        }
+        return requests;
+    }
+
+    async getConnectionState(requesterId, recipientId){
+        let cnt1 = await ConnectionModel.count({where: {
+            [Op.or]: [
+                {[Op.and]: [
+                    { recipient_id: recipientId },
+                    { requester_id: requesterId },
+                    { state:'pending'}
+                ]}, 
+               {[Op.and]: [
+                    { recipient_id: requesterId },
+                    { requester_id: recipientId },
+                    { state:'pending'}
+                ]}
+            ]
+        }})
+
+        let cnt2 = await ConnectionModel.count({where: {
+            [Op.or]: [
+                {[Op.and]: [
+                    { recipient_id: recipientId },
+                    { requester_id: requesterId },
+                    { state:'accepted'}
+                ]}, 
+               {[Op.and]: [
+                    { recipient_id: requesterId },
+                    { requester_id: recipientId },
+                    { state:'accepted'}
+                ]}
+            ]
+        }})
+
+        let message;
+
+        if(cnt1!=0){
+            message= "pending";
+        }
+        else if(cnt2!=0){
+             message =  "accepted";
+        }        
+        else{
+            message = "none"
+        }   
+        return message;
+    }
+
+    
 
     
 }
@@ -470,3 +540,6 @@ module.exports = User;
 //user1.viewEvent(1).then(result=>console.log("Event Details: ",result));
 
 //user1.searchUser("Lahiru").then(result=>console.log("Search Details: ",result));
+//user1.viewRequests(2).then(result=>console.log("Requests: ",result));
+//user1.getConnectionState(33,21).then(result=>console.log("State: ",result));
+//user1.getConnectedId(21).then(result=>console.log("ID: ",result));

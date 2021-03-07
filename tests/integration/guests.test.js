@@ -36,19 +36,18 @@ describe('/users', () => {
         const res = await exec();
 
         expect(res.status).toBe(200);
-        expect(res.body).toHaveProperty("obj", [[{"first_name": "Dinesh","last_name": "Chandimal","profile_pic": null,}],[],[],[]]);  
+        expect(res.body).toHaveProperty("message", "User found");  
 
         });
 
 
-        it('should return an empty guest with the given id that not exists', async () => {
+        it('should return 500 when given id that not exists', async () => {
         
         id=253;
 
         const res = await exec();
 
-        expect(res.status).toBe(200);
-        expect(res.body).toHaveProperty("obj", [[],[],[],[]]); 
+        expect(res.status).toBe(500);
         });
 
     });
@@ -58,7 +57,7 @@ describe('/users', () => {
         let new_user_info;
 
         const exec=async()=>{
-            new_user_info = {firstName:"sachi",lastName:"sena", email:"senaa@mail.com", password:"password"};
+            new_user_info = {firstName:"john",lastName:"azure", email:"john@mail.com", password:"password"};
             return await request(server).post('/users/').send( new_user_info);
         }
 
@@ -76,8 +75,8 @@ describe('/users', () => {
             new_user_info = {firstName:"Dinesh",lastName:"Chandimal", email:"chandi@gmail.com", password:"password"};
             const res = await exec();
     
-            expect(res.status).toBe(200);
-            expect(res.body).toHaveProperty("msg", "User already exists");
+            expect(res.status).toBe(400);
+            expect(res.body).toHaveProperty("message", "User already exists");
         });
 
       });
