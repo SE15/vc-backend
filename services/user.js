@@ -226,7 +226,6 @@ class User{
     
     async addConnection(recipient_id,passedid) {
         //temp data
-        
         this.requester_id = passedid;
         let reque_id=this.requester_id;
         let checkin=null;
@@ -347,7 +346,7 @@ class User{
     async viewProfile(user_id){
        
         const user=await UserModel.findAll({
-            attributes:['first_name','last_name','profile_pic'], raw: true,
+            attributes:['id','first_name','last_name','profile_pic'], raw: true,
             where:{[Op.and]:
                 [{id:`${user_id}`,is_deleted:0}]
                     

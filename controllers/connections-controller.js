@@ -24,8 +24,8 @@ const addConnection = async (req, res, next) => {
     try {
         //user id taken from authentication not from url but passes in url
         let passedid = req.user;
-        const userID = req.params.recipientid;
-        const response = await user.addConnection(userID, passedid.id);
+        const userID = req.params.userid;
+        const response = await user.addConnection(userID, passedid);
 
         if (response === true) {
             return successMessage(res, true, 'Requeest sent to the user');
@@ -46,7 +46,7 @@ const respondConnection = async (req, res, next) => {
         const recipientid = req.params.recipientid;
         const accept = req.body.accept;
 
-        const response = await user.respondConnection(recipientid, accept, passedid.id);
+        const response = await user.respondConnection(recipientid, accept, passedid);
 
         if (response === true) {
             return successMessage(res, true, "You have accepted the connection");
@@ -65,7 +65,7 @@ const removeConnection = async (req, res, next) => {
         //user id taken from authentication not from url but passes in url
         let passedid = req.user;
         const userID = req.params.recipientid;
-        const response = await user.removeConnection(userID, passedid.id);
+        const response = await user.removeConnection(userID, passedid);
 
         if (response === true) {
             return successMessage(res, true, "Connection removed successfully");

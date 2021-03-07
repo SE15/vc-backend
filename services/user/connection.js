@@ -110,7 +110,8 @@ class Connection {
                     where: {
                         [Op.and]: [
                             { requester_id: requester_id },
-                            { recipient_id: recipi_id }
+                            { recipient_id: recipi_id },
+                            { state: 'pending' }
                         ]}, transaction : t});
                         return true;
             
@@ -123,7 +124,8 @@ class Connection {
                     where: {
                         [Op.and]: [
                             { requester_id: requester_id },
-                            { recipient_id: recipi_id }
+                            { recipient_id: recipi_id },
+                            { state: 'pending' }
                         ]}, transaction : t});
                 return false;
                        

@@ -1,5 +1,4 @@
-const express = require('express');
-const router = express.Router();
+const router = require('express').Router({mergeParams: true});
 const authorization = require('../../middlewares/authorization');
 
 const { addConnection, respondConnection, removeConnection, getConnectionRequests, getConnectionStatus } = require('../../controllers/connections-controller');
