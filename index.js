@@ -32,4 +32,4 @@ server.listen(port, hostname, () => {
 });
 
 //for testing
-//module.exports=server;
+module.exports=server;

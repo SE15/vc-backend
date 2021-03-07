@@ -40,9 +40,9 @@ const searchUser = async (req, res, next) => {
 const viewProfile = async (req, res, next) => {
   try {
     const userID = req.params.userid;
-    
-    if (req.user) {const profile = await user.viewProfile(userID);}
-    else {const profile = await guest.viewProfile(userID);}
+    let profile;
+    if (req.user) {profile = await user.viewProfile(userID);}
+    else {profile = await guest.viewProfile(userID);}
 
     const response = {
       err: 0,

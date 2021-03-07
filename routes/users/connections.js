@@ -4,7 +4,8 @@ const authorization = require('../../middlewares/authorization');
 
 const { addConnection, respondConnection, removeConnection } = require('../../controllers/connections-controller');
 
-router.post('/',authorization, addConnection);
+router.post('/', addConnection);
+//router.post('/',authorization, addConnection);
 router.put('/:recipientid',authorization, respondConnection);
 router.delete('/:recipientid', authorization, removeConnection);
 

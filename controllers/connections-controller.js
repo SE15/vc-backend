@@ -4,9 +4,10 @@ let user = new User();
 const addConnection = async (req, res, next) => {
     try {
         //user id taken from authentication not from url but passes in url
-        let passedid = req.user;
+        //let passedid = req.user;
+        const passedid = req.body.recipient_id;
         const userID = req.params.userid;
-        const responce = await user.addConnection(userID, passedid.id);
+        const responce = await user.addConnection(userID, passedid);
 
         if (responce === true) {
             const response = {
