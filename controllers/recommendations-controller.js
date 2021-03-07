@@ -8,7 +8,7 @@ const submitRecommendation = async (req, res, next) => {
         let passedid = req.user;
         const userID = req.params.userid;
         const description = req.body.description;
-        const response = await user.submitRecommendation(userID, description, passedid.id);
+        const response = await user.submitRecommendation(userID, description, passedid);
 
         if (response === true) {
             return successMessage(res, true, "You have submitted the recommendation");

@@ -65,7 +65,7 @@ const deleteAccount = async (req, res, next) => {
     //user id taken from authentication not from url but passes in url
     let passedid = req.user;
 
-    const response = await user.deleteAccount(passedid.id);
+    const response = await user.deleteAccount(passedid);
 
     if (response === true) {
       return successMessage(res, true, "User successfully deleted");
@@ -98,7 +98,7 @@ const editProfile = async (req, res, next) => {
     switch (method) {
       case 'edit-info':
         const information = req.body;   // convert to an array 
-        response = await user.editProfile(information, passedid.id);
+        response = await user.editProfile(information, passedid);
 
         if (response === true) {
           return successMessage(res, true, "Successfully updated the profile");
@@ -109,7 +109,7 @@ const editProfile = async (req, res, next) => {
         const oldPass = req.body.oldPass;
         const newPass = req.body.newPass;
 
-        response = await user.changePassword(oldPass, newPass, passedid.id);
+        response = await user.changePassword(oldPass, newPass, passedid);
 
         if (response === true) {
           return successMessage(res, true, "Successfully changed the password");

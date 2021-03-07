@@ -8,7 +8,7 @@ const addSkill = async (req, res, next) => {
         let passedid = req.user;
         const name = req.body.name;
 
-        const response = await User.addSkill(name, passedid.id);
+        const response = await User.addSkill(name, passedid);
 
 
         if (response === true) {
@@ -44,7 +44,7 @@ const validateSkill = async (req, res, next) => {
         //user id taken from authentication not from url but passes in url
         let passedid = req.user;
         const skillID = req.params.skillid;
-        const response = await user.validateSkill(skillID, passedid.id);
+        const response = await user.validateSkill(skillID, passedid);
 
         if (response === true) {
             return successMessage(res, true, "You have validated the skill");

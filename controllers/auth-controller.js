@@ -27,7 +27,7 @@ const login = async (req, res, next) => {
 
         if (pass === passw) {
             jwt.sign(
-                { userID: usr.id, expiresIn: 3600, firstName: first_name, lastName: last_name, profilePic: profile_pic },
+                { userID: usr.id, expiresIn: 3600, firstName: usr.first_name, lastName: usr.last_name, profilePic: usr.profile_pic },
                 config.get('jwtSecret'),
                 (err, token) => {
                     if (err) throw err;
