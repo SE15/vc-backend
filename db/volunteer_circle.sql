@@ -9,7 +9,7 @@ CREATE TABLE `User` (
   `last_name` varchar(150) NOT NULL,
   `email` varchar(100) NOT NULL UNIQUE,
   `password` char(32) NOT NULL,
-  `profile_pic` varchar(150),
+  `profile_pic` varchar(150) DEFAULT '',
   `is_deleted` tinyint(1) NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`)
 );
@@ -63,10 +63,38 @@ CREATE TRIGGER `TR_OwnerCannotValidateOwnSkill`
   BEFORE INSERT ON `Validation`
   FOR EACH ROW
   BEGIN
-    IF (NEW.`validated_by` = (SELECT `user_id` WHERE `skill_id` = NEW.`skill_id`))
+    IF (NEW.`validated_by` = (SELECT `user_id` FROM `skill` WHERE `id` = NEW.`skill_id`))
     THEN
       SIGNAL SQLSTATE '02000'  
       SET MESSAGE_TEXT = 'Warning: owner cannot validate his own skill';
+    END IF;
+  END$$
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE TRIGGER `TR_OwnerCannotRecommendHimself`
+  BEFORE INSERT ON `Recommendation`
+  FOR EACH ROW
+  BEGIN
+    IF (NEW.`recommended_by` = NEW.`user_id`)
+    THEN
+      SIGNAL SQLSTATE '02000'  
+      SET MESSAGE_TEXT = 'Warning: owner cannot recommend himself';
+    END IF;
+  END$$
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE TRIGGER `TR_OwnerCannotSendConnectionToHimself`
+  BEFORE INSERT ON `Connection`
+  FOR EACH ROW
+  BEGIN
+    IF (NEW.`requester_id` = NEW.`recipient_id`)
+    THEN
+      SIGNAL SQLSTATE '02000'  
+      SET MESSAGE_TEXT = 'Warning: owner cannot send a connection to himself';
     END IF;
   END$$
 DELIMITER ;

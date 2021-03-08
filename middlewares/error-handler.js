@@ -6,8 +6,9 @@ const errorLog = (...params) => {
 
 const errorHandler = (error, req, res, next) => {
     errorLog(error.message);
+    console.log(error);
     
-    return errorMessage(res, error.message, 500);
+    return errorMessage(res, 'Oh no! Something went wrong', 500);
 }
 
 module.exports = errorHandler;

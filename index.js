@@ -4,11 +4,13 @@ const express = require('express'),
 const HttpStatus = require('http-status');
 const cors = require("cors");
 
+
 const hostname = 'localhost';
 const port = 5000;
 
 const app = express();
 
+app.use(express.static('public'));
 app.use(require('./middlewares/request-logger'));
 
 const routes = require('./routes');

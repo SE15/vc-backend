@@ -13,7 +13,7 @@ const submitRecommendation = async (req, res, next) => {
         if (response === true) {
             return successMessage(res, true, "You have submitted the recommendation");
         } else {
-            return errorMessage(res, "Unable to submit the recommendation", 500);
+            return errorMessage(res, "You have already posted a recommendation to this user", 500);
         }
     } catch (err) {
         next(err);

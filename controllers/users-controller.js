@@ -21,7 +21,7 @@ const searchUser = async (req, res, next) => {
         const results = (req.user) ? await user.searchUser(key) : await guest.searchUser(key);
         users = [...users, ...results];
       }
-      users = users.filter((user,ind) => {
+      users = users.filter((user, ind) => {
         let tempUsers = [...users];
         tempUsers.splice(ind);
         for (const u of tempUsers) {
@@ -117,8 +117,20 @@ const editProfile = async (req, res, next) => {
         } else {
           return errorMessage(res, "Unable to change the password", 500);
         }
+
+      case 'change-profile-pic':
+        const profilePic = 'http://localhost:5000/' + req.file.filename;
+
+        response = await user.editProfile({ profile_pic: profilePic }, passedid);
+
+        if (response === true) {
+          return successMessage(res, profilePic, "Successfully changed the profile picture");
+        } else {
+          return errorMessage(res, "Unable to change the profile picture", 500);
+        }
+
       default:
-        return errorMessage(res, "Invalid method");
+        return errorMessage(res, method);
     }
   } catch (err) {
     next(err);

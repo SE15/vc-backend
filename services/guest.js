@@ -93,7 +93,7 @@ class Guest{
             let description=records[i].description;
 
             let recommended_name=await UserModel.findOne({
-            attributes:["first_name","last_name"],
+            attributes:["id", "first_name","last_name", "profile_pic"],
             where:{id:recommended_by},raw:true
             });
 
@@ -134,7 +134,7 @@ class Guest{
            // console.log(con_id);
             
             let name=await UserModel.findOne({
-                attributes:["id","first_name","last_name"],
+                attributes:["id","first_name","last_name", "profile_pic"],
                 where:{
                     id:con_id                    
                 },raw:true
@@ -150,7 +150,7 @@ class Guest{
            // console.log(con_id);
             
             let name=await UserModel.findOne({
-                attributes:["id","first_name","last_name"],
+                attributes:["id","first_name","last_name","profile_pic"],
                 where:{
                     id:con_id
                 },raw:true
@@ -206,7 +206,7 @@ class Guest{
             let description=records[i].description;
 
             let recommended_name=await UserModel.findOne({
-            attributes:["first_name","last_name"],
+            attributes:["first_name","last_name","profile_pic"],
             where:{id:recommended_by},raw:true
             });
 
@@ -247,7 +247,7 @@ class Guest{
            // console.log(con_id);
             
             let name=await UserModel.findOne({
-                attributes:["first_name","last_name"],
+                attributes:["first_name","last_name","profile_pic"],
                 where:{
                     id:con_id
                 },raw:true
@@ -263,7 +263,7 @@ class Guest{
            // console.log(con_id);
             
             let name=await UserModel.findOne({
-                attributes:["first_name","last_name"],
+                attributes:["first_name","last_name","profile_pic"],
                 where:{
                     id:con_id
                 },raw:true
