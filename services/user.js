@@ -296,7 +296,7 @@ class User{
         let skill = new Skill({user_id: this.user_id, name: name});
         let addSkill= await skill.saveToDatabase(true);
         if(addSkill==true){
-            return true;
+            return skill.id;
         }else{
             return false;
         }

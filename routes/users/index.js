@@ -2,7 +2,7 @@ const router = require('express').Router();
 const authorization = require('../../middlewares/authorization');
 const guestAccess = require('../../middlewares/guest-access');
 
-const { searchUser, createAccount, viewProfile, deleteAccount, changePassword, editProfile} = require('../../controllers/users-controller');
+const { searchUser, createAccount, viewProfile, deleteAccount, editProfile} = require('../../controllers/users-controller');
 
 router.use('/:userid/connections', require('./connections'));
 router.use('/:userid/recommendations', require('./recommendations'));
@@ -13,7 +13,6 @@ router.post('/', createAccount);
 
 router.get('/:userid', viewProfile);
 router.delete('/:userid', authorization, deleteAccount);
-router.put('/:userid', authorization, changePassword);
-router.post('/:userid', authorization, editProfile);
+router.put('/:userid', authorization, editProfile);
 
 module.exports = router;

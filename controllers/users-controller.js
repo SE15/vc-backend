@@ -94,7 +94,8 @@ const editProfile = async (req, res, next) => {
     let passedid = req.user;
     let response;
 
-    const method = red.body.method;
+    const method = req.body.method;
+
     switch (method) {
       case 'edit-info':
         const information = req.body;   // convert to an array 

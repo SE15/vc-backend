@@ -8,13 +8,13 @@ const addSkill = async (req, res, next) => {
         let passedid = req.user;
         const name = req.body.name;
 
-        const response = await User.addSkill(name, passedid);
+        const response = await user.addSkill(name, passedid);
 
 
-        if (response === true) {
-            return successMessage(res, true, "Successfully added the skill");
-        } else if (response == "added") {
-            return errorMessage(res, "This has already added");
+        if (response === false) {
+            return errorMessage(res, "There is an existing skill with the same name");
+        } else if (response) {
+            return successMessage(res, response, "Successfully added the skill");
         } else {
             return errorMessage(res, "Unable to add the skill", 500);
         }
