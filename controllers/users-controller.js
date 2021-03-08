@@ -47,7 +47,8 @@ const viewProfile = async (req, res, next) => {
   try {
     const userID = req.params.userid;
 
-    const profile = (req.user) ? await user.viewProfile(userID) : await guest.viewProfile(userID);
+    let something = req.user;
+    const profile = (req.user) ? await user.viewProfile(userID, req.user) : await guest.viewProfile(userID);
     let output = profile[0][0];
     output.skills = profile[1];
     output.recommendations = profile[2];

@@ -24,7 +24,7 @@ router.use('/:userid/skills', require('./skills'));
 router.get('/', guestAccess, authorization, searchUser);
 router.post('/', createAccount);
 
-router.get('/:userid', viewProfile);
+router.get('/:userid', guestAccess, authorization, viewProfile);
 router.delete('/:userid', authorization, deleteAccount);
 router.put('/:userid', authorization, upload, editProfile);
 
