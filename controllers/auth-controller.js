@@ -19,11 +19,8 @@ const login = async (req, res, next) => {
         }
         
         let pass = user[0][0].password;
-        console.log(pass);
         let passw = md5(password);
-        console.log(passw);
         let usr = user[0][0];
-        console.log(usr);
 
         if (pass === passw) {
             jwt.sign(

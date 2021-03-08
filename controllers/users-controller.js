@@ -78,17 +78,6 @@ const deleteAccount = async (req, res, next) => {
   }
 };
 
-
-const changePassword = async (req, res, next) => {
-  try {
-    //user id taken from authentication not from url but passes in url
-    let passedid = req.user;
-
-  } catch (err) {
-    next(err);
-  }
-};
-
 const editProfile = async (req, res, next) => {
   try {
     //user id taken from authentication not from url but passes in url
@@ -107,6 +96,7 @@ const editProfile = async (req, res, next) => {
         } else {
           return errorMessage(res, "Unable to update the profile", 500);
         }
+
       case 'change-password':
         const oldPass = req.body.oldPass;
         const newPass = req.body.newPass;
@@ -116,7 +106,7 @@ const editProfile = async (req, res, next) => {
         if (response === true) {
           return successMessage(res, true, "Successfully changed the password");
         } else {
-          return errorMessage(res, "Unable to change the password", 500);
+          return errorMessage(res, "Invalid password", 500);
         }
 
       case 'change-profile-pic':
@@ -162,7 +152,6 @@ const createAccount = async (req, res, next) => {
 module.exports = {
   searchUser,
   viewProfile,
-  changePassword,
   deleteAccount,
   editProfile,
   createAccount
