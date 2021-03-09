@@ -1,10 +1,15 @@
+DROP DATABASE IF EXISTS volunteer_circle;
+CREATE DATABASE volunteer_circle;
+USE volunteer_circle;
+
+
 CREATE TABLE `User` (
   `id` int NOT NULL AUTO_INCREMENT,
   `first_name` varchar(150) NOT NULL,
   `last_name` varchar(150) NOT NULL,
-  `email` varchar(100) NOT NULL,
+  `email` varchar(100) NOT NULL UNIQUE,
   `password` char(32) NOT NULL,
-  `profile_pic` varchar(150),
+  `profile_pic` varchar(150) DEFAULT '',
   `is_deleted` tinyint(1) NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`)
 );
@@ -31,16 +36,6 @@ CREATE TABLE `Connection` (
   REFERENCES User(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
-CREATE TABLE `Event` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `name` varchar(150) NOT NULL,
-  `location` varchar(150),
-  `start_date` timestamp,
-  `end_date` timestamp,
-  `state` enum('upcoming','in-progress','closed','deleted') NOT NULL,
-  PRIMARY KEY (`id`)
-);
-
 CREATE TABLE `Skill` (
   `id` int NOT NULL AUTO_INCREMENT,
   `user_id` int NOT NULL,
@@ -62,16 +57,44 @@ CREATE TABLE `Validation` (
   REFERENCES User(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
-CREATE TABLE `Membership` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `user_id` int NOT NULL,
-  `event_id` int NOT NULL,
-  `role` enum('requester','member','manager','admin','rejected','fmember') NOT NULL DEFAULT 'requester',
-  `designation` varchar(100) NOT NULL,
-  PRIMARY KEY (`id`),
-  CONSTRAINT UC_UserEvent UNIQUE(`user_id`,`event_id`),
-  CONSTRAINT FK_MembershipUser FOREIGN KEY (user_id) 
-  REFERENCES User(id) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT FK_MembershipEvent FOREIGN KEY (event_id) 
-  REFERENCES Event(id) ON DELETE CASCADE ON UPDATE CASCADE
-);
+DELIMITER $$
+
+CREATE TRIGGER `TR_OwnerCannotValidateOwnSkill`
+  BEFORE INSERT ON `Validation`
+  FOR EACH ROW
+  BEGIN
+    IF (NEW.`validated_by` = (SELECT `user_id` FROM `skill` WHERE `id` = NEW.`skill_id`))
+    THEN
+      SIGNAL SQLSTATE '02000'  
+      SET MESSAGE_TEXT = 'Warning: owner cannot validate his own skill';
+    END IF;
+  END$$
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE TRIGGER `TR_OwnerCannotRecommendHimself`
+  BEFORE INSERT ON `Recommendation`
+  FOR EACH ROW
+  BEGIN
+    IF (NEW.`recommended_by` = NEW.`user_id`)
+    THEN
+      SIGNAL SQLSTATE '02000'  
+      SET MESSAGE_TEXT = 'Warning: owner cannot recommend himself';
+    END IF;
+  END$$
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE TRIGGER `TR_OwnerCannotSendConnectionToHimself`
+  BEFORE INSERT ON `Connection`
+  FOR EACH ROW
+  BEGIN
+    IF (NEW.`requester_id` = NEW.`recipient_id`)
+    THEN
+      SIGNAL SQLSTATE '02000'  
+      SET MESSAGE_TEXT = 'Warning: owner cannot send a connection to himself';
+    END IF;
+  END$$
+DELIMITER ;

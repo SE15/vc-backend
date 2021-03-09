@@ -5,6 +5,7 @@ const md5 = require('md5');
 const RecommendationModel = require('../models/recommendation-model');
 const SkillModel = require('../models/skill-model');
 const ConnectionModel = require('../models/connection-model');
+const { login } = require('../controllers/auth-controller');
 
 
 class Guest{
@@ -60,9 +61,9 @@ class Guest{
     async searchUser(name){
     
         const user=UserModel.findAll({
-            attributes:['first_name','last_name','profile_pic'], raw: true,
+            attributes:['id','first_name','last_name','profile_pic'], raw: true,
             where:{
-                [Op.or]:[{first_name: `${name}`,is_deleted:0},{last_name: `${name}`, is_deleted:0}]
+                [Op.or]:[{first_name: {[Op.substring]: name},is_deleted:0},{last_name: {[Op.substring]: name}, is_deleted:0}]
                     
             }
         });
@@ -73,7 +74,7 @@ class Guest{
     async viewProfile(user_id){
        
         const user=await UserModel.findAll({
-            attributes:['first_name','last_name','profile_pic'], raw: true,
+            attributes:['id','first_name','last_name','profile_pic'], raw: true,
             where:{[Op.and]:
                 [{id:`${user_id}`,is_deleted:0}]
                     
@@ -92,7 +93,7 @@ class Guest{
             let description=records[i].description;
 
             let recommended_name=await UserModel.findOne({
-            attributes:["first_name","last_name"],
+            attributes:["id", "first_name","last_name", "profile_pic"],
             where:{id:recommended_by},raw:true
             });
 
@@ -102,7 +103,7 @@ class Guest{
         }
     
         const skills=await SkillModel.findAll({
-            attributes:['name','validations'], raw: true,
+            attributes:['id','name','validations'], raw: true,
             where:
                 [{user_id:`${user_id}`}]
         });
@@ -133,9 +134,9 @@ class Guest{
            // console.log(con_id);
             
             let name=await UserModel.findOne({
-                attributes:["first_name","last_name"],
+                attributes:["id","first_name","last_name", "profile_pic"],
                 where:{
-                    id:con_id
+                    id:con_id                    
                 },raw:true
             });
             //Object.assign({},name);
@@ -149,7 +150,7 @@ class Guest{
            // console.log(con_id);
             
             let name=await UserModel.findOne({
-                attributes:["first_name","last_name"],
+                attributes:["id","first_name","last_name","profile_pic"],
                 where:{
                     id:con_id
                 },raw:true
@@ -175,12 +176,14 @@ class Guest{
 
         const login_id = await UserModel.findOne({
             arrtibute:["id"],
-            where:{
-                email:email
+            where:{[Op.and]:
+                [{email:email,is_deleted:0}]
+                    
             },raw:true
         });
 
-        
+        if (login_id === null) throw new Error('Invalid email or password');
+
         let user_id= login_id.id;
        
         const user=await UserModel.findAll({
@@ -203,7 +206,7 @@ class Guest{
             let description=records[i].description;
 
             let recommended_name=await UserModel.findOne({
-            attributes:["first_name","last_name"],
+            attributes:["first_name","last_name","profile_pic"],
             where:{id:recommended_by},raw:true
             });
 
@@ -244,7 +247,7 @@ class Guest{
            // console.log(con_id);
             
             let name=await UserModel.findOne({
-                attributes:["first_name","last_name"],
+                attributes:["first_name","last_name","profile_pic"],
                 where:{
                     id:con_id
                 },raw:true
@@ -260,7 +263,7 @@ class Guest{
            // console.log(con_id);
             
             let name=await UserModel.findOne({
-                attributes:["first_name","last_name"],
+                attributes:["first_name","last_name","profile_pic"],
                 where:{
                     id:con_id
                 },raw:true

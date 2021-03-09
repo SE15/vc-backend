@@ -1,19 +1,31 @@
-const routes = require('express').Router();
+const router = require('express').Router();
 const authorization = require('../../middlewares/authorization');
 const guestAccess = require('../../middlewares/guest-access');
+const multer = require('multer');
 
-const { searchUser, createAccount, viewProfile, deleteAccount, changePassword, editProfile} = require('../../controllers/users-controller');
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, 'public')
+    },
+    filename: (req, file, cb) => {
+        const extensions = file.originalname.split('.');
+        imageExtension = extensions[extensions.length - 1];
+        cb(null, `user${req.user}.${imageExtension}`);
+    }
+})
+const upload = multer({ storage: storage }).single('picture');
 
-routes.use('/:userid/connections', require('./connections'));
-routes.use('/:userid/recommendations', require('./recommendations'));
-routes.use('/:userid/skills', require('./skills'));
+const { searchUser, createAccount, viewProfile, deleteAccount, editProfile } = require('../../controllers/users-controller');
 
-routes.get('/', guestAccess, authorization, searchUser);
-routes.post('/', createAccount);
+router.use('/:userid/connections', require('./connections'));
+router.use('/:userid/recommendations', require('./recommendations'));
+router.use('/:userid/skills', require('./skills'));
 
-routes.get('/:userid', guestAccess, authorization, viewProfile);
-routes.delete('/:userid', authorization, deleteAccount);
-routes.put('/:userid', authorization, changePassword);
-routes.post('/:userid', authorization, editProfile);
+router.get('/', guestAccess, authorization, searchUser);
+router.post('/', createAccount);
 
-module.exports = routes;
+router.get('/:userid', guestAccess, authorization, viewProfile);
+router.delete('/:userid', authorization, deleteAccount);
+router.put('/:userid', authorization, upload, editProfile);
+
+module.exports = router;

@@ -1,5 +1,6 @@
 const User = require('../services/user.js');
 const Guest = require('../services/guest.js');
+const { successMessage, errorMessage } = require("../utils/message-template");
 
 // Instantiate User:
 let user = new User();
@@ -11,27 +12,32 @@ const searchUser = async (req, res, next) => {
     //console.log("usr");
     //let ff = req.user;
     //console.log(ff.id);
-    const keyword = req.query.keyword;  
+    const keyword = req.query.keyword;
 
-    const users = (req.user) ? await user.searchUser(keyword) :  await guest.searchUser(keyword);
-
-    if (users.length) {
-      const response = {
-        err: 0,
-        obj: users,
-        msg: ""
+    let users = [];
+    if (keyword.indexOf(' ') >= 0) {
+      const keywords = keyword.split(' ');
+      for (const key of keywords) {
+        const results = (req.user) ? await user.searchUser(key) : await guest.searchUser(key);
+        users = [...users, ...results];
       }
-
-      return res.json(response);
+      users = users.filter((user, ind) => {
+        let tempUsers = [...users];
+        tempUsers.splice(ind);
+        for (const u of tempUsers) {
+          if (u.id === user.id) return false;
+        }
+        return true;
+      })
     } else {
-      const response = {
-        err: 1,
-        obj: {},
-        msg: "No result found"
-      }
-      return res.json(response);
+      users = (req.user) ? await user.searchUser(keyword) : await guest.searchUser(keyword);
     }
 
+    if (users.length) {
+      return successMessage(res, users, "Users found");
+    } else {
+      return errorMessage(res, "No results found");
+    }
   } catch (err) {
     next(err);
   }
@@ -40,17 +46,16 @@ const searchUser = async (req, res, next) => {
 const viewProfile = async (req, res, next) => {
   try {
     const userID = req.params.userid;
-    
-    let profile;
-    if (req.user) {profile = await user.viewProfile(userID);}
-    else {profile = await guest.viewProfile(userID);}
-    
-    const response = {
-      err: 0,
-      obj: profile,
-      msg: ""
-    }
-    return res.json(response);
+
+    let something = req.user;
+    const profile = (req.user) ? await user.viewProfile(userID, req.user) : await guest.viewProfile(userID);
+    let output = profile[0][0];
+    output.skills = profile[1];
+    output.recommendations = profile[2];
+    output.connections = profile[3]
+
+    return successMessage(res, output, "User found");
+
   } catch (err) {
     next(err);
   }
@@ -61,52 +66,12 @@ const deleteAccount = async (req, res, next) => {
     //user id taken from authentication not from url but passes in url
     let passedid = req.user;
 
-    const responce = await user.deleteAccount(passedid.id);
+    const response = await user.deleteAccount(passedid);
 
-    if (responce === true) {
-      const response = {
-        err: 0,
-        obj: true,
-        msg: "User successfully deleted"
-      }
-      return res.json(response);
+    if (response === true) {
+      return successMessage(res, true, "User successfully deleted");
     } else {
-      const response = {
-        err: 1,
-        obj: {},
-        msg: "Something is wrong"
-      }
-      return res.json(response);
-    }
-  } catch (err) {
-    next(err);
-  }
-};
-
-
-const changePassword = async (req, res, next) => {
-  try {
-    //user id taken from authentication not from url but passes in url
-    let passedid = req.user;
-    const oldPass = req.body.oldPass;
-    const newPass = req.body.newPass;
-
-    const responce = await user.changePassword(oldPass, newPass, passedid.id);
-
-    if (responce === true) {
-      const response = {
-        err: 0,
-        obj: true,
-        msg: "Successfully changed the password"
-      }
-      return res.json(response);
-    } else {
-      const response = {
-        err: 1,
-        obj: {},
-        msg: "Something is wrong"
-      }
-      return res.json(response);
+      return errorMessage(res, "Unable to delete the account", 500);
     }
   } catch (err) {
     next(err);
@@ -117,25 +82,47 @@ const editProfile = async (req, res, next) => {
   try {
     //user id taken from authentication not from url but passes in url
     let passedid = req.user;
-    const information = req.body;   // convert to an array 
-    const responce = await user.editProfile(information, passedid.id);
+    let response;
 
-    if (responce === true) {
-      const response = {
-        err: 0,
-        obj: true,
-        msg: "Profile updated"
-      }
-      return res.json(response);
-    } else {
-      const response = {
-        err: 1,
-        obj: {},
-        msg: "Something is wrong"
-      }
-      return res.json(response);
+    const method = req.body.method;
+
+    switch (method) {
+      case 'edit-info':
+        const information = req.body;   // convert to an array 
+        response = await user.editProfile(information, passedid);
+
+        if (response === true) {
+          return successMessage(res, true, "Successfully updated the profile");
+        } else {
+          return errorMessage(res, "Unable to update the profile", 500);
+        }
+
+      case 'change-password':
+        const oldPass = req.body.oldPass;
+        const newPass = req.body.newPass;
+
+        response = await user.changePassword(oldPass, newPass, passedid);
+
+        if (response === true) {
+          return successMessage(res, true, "Successfully changed the password");
+        } else {
+          return errorMessage(res, "Invalid password", 500);
+        }
+
+      case 'change-profile-pic':
+        const profilePic = 'http://localhost:5000/' + req.file.filename;
+
+        response = await user.editProfile({ profile_pic: profilePic }, passedid);
+
+        if (response === true) {
+          return successMessage(res, profilePic, "Successfully changed the profile picture");
+        } else {
+          return errorMessage(res, "Unable to change the profile picture", 500);
+        }
+
+      default:
+        return errorMessage(res, method);
     }
-
   } catch (err) {
     next(err);
   }
@@ -150,26 +137,11 @@ const createAccount = async (req, res, next) => {
     const response = await guest.createAccount(information);
 
     if (response === true) {
-      const response = {
-        err: 0,
-        obj: true,
-        msg: "User successfully registered"
-      }
-      return res.json(response);
+      return successMessage(res, true, "User successfully registered");
     } else if (response === false) {
-      const response = {
-        err: 0,
-        obj: false,
-        msg: "User already exists"
-      }
-      return res.json(response);
+      return errorMessage(res, "User already exists");
     } else {
-      const response = {
-        err: 0,
-        obj: {},
-        msg: "Something is wrong"
-      }
-      return res.json(response);
+      return errorMessage(res, "Unable to create an account", 500);
     }
 
   } catch (err) {
@@ -180,7 +152,6 @@ const createAccount = async (req, res, next) => {
 module.exports = {
   searchUser,
   viewProfile,
-  changePassword,
   deleteAccount,
   editProfile,
   createAccount
