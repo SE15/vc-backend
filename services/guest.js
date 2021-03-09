@@ -5,6 +5,7 @@ const md5 = require('md5');
 const RecommendationModel = require('../models/recommendation-model');
 const SkillModel = require('../models/skill-model');
 const ConnectionModel = require('../models/connection-model');
+const ValidationModel=require('../models/validation-model');
 
 
 class Guest{
@@ -102,10 +103,34 @@ class Guest{
         }
     
         const skills=await SkillModel.findAll({
-            attributes:['name','validations'], raw: true,
+            attributes:['id','name','validations'], raw: true,
             where:
-                [{user_id:`${user_id}`}]
+                [{user_id:`${user_id}`}],
         });
+
+        
+        for(const j in skills){
+                let skillid=skills[j].id;
+                let validated=await ValidationModel.findAll({
+                    attributes:["validated_by"],
+                    where:{
+                        skill_id:skillid
+                    },raw:true
+
+                    
+                });
+                let validatedby_arr=[];
+
+                for (const k in validated){
+                    let validated_id=validated[k].validated_by;
+                    validatedby_arr.push(validated_id);
+                }
+                //console.log(validatedby_arr)
+                var arr=validatedby_arr.toString();
+                skills[j].validated_by=arr;
+
+        }
+
 
         var profile=[];
         profile.push(user);
@@ -133,9 +158,9 @@ class Guest{
            // console.log(con_id);
             
             let name=await UserModel.findOne({
-                attributes:["first_name","last_name"],
+                attributes:["id","first_name","last_name"],
                 where:{
-                    id:con_id
+                    id:con_id                    
                 },raw:true
             });
             //Object.assign({},name);
@@ -149,7 +174,7 @@ class Guest{
            // console.log(con_id);
             
             let name=await UserModel.findOne({
-                attributes:["first_name","last_name"],
+                attributes:["id","first_name","last_name"],
                 where:{
                     id:con_id
                 },raw:true
@@ -163,7 +188,6 @@ class Guest{
         
         profile.push(names);
 
-        //console.log(connections);
         //return records;
         //return user;
         //return mergeduser;
@@ -290,5 +314,5 @@ module.exports=Guest;
 //guest1 = new Guest();
 //guest1.searchUser("Lahiru").then(result => console.log('Connection Added: ', result));
 //guest1.createAccount([{first_name: "Lahiru" ,last_name: "Madhushan", email:'lahiru1@gmail.com', password:'abc'}]).then(result => console.log('Account Creation: ', result));
-//guest1.viewProfile(2).then(result => console.log('Profile Status: ', result));
+//guest1.viewProfile(33).then(result => console.log('Profile Status: ', result));
 //guest1.getUser("sanga@gmail.com").then(result => console.log('Connection Added: ', result));

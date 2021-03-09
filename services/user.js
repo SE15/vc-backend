@@ -12,6 +12,7 @@ const Connection = require('./user/connection.js');
 const Skill = require('./user/skill');
 const Recommendation = require('./user/recommendation');
 const md5 = require('md5');
+const ValidationModel=require('../models/validation-model');
 
 class User{
     constructor(){
@@ -378,10 +379,34 @@ class User{
         }
     
         const skills=await SkillModel.findAll({
-            attributes:['name','validations'], raw: true,
+            attributes:['id','name','validations'], raw: true,
             where:
-                [{user_id:`${user_id}`}]
+                [{user_id:`${user_id}`}],
         });
+
+        
+        for(const j in skills){
+                let skillid=skills[j].id;
+                let validated=await ValidationModel.findAll({
+                    attributes:["validated_by"],
+                    where:{
+                        skill_id:skillid
+                    },raw:true
+
+                    
+                });
+                let validatedby_arr=[];
+
+                for (const k in validated){
+                    let validated_id=validated[k].validated_by;
+                    validatedby_arr.push(validated_id);
+                }
+                //console.log(validatedby_arr)
+                var arr=validatedby_arr.toString();
+                skills[j].validated_by=arr;
+
+        }
+
 
         var profile=[];
         profile.push(user);
@@ -409,9 +434,9 @@ class User{
            // console.log(con_id);
             
             let name=await UserModel.findOne({
-                attributes:["first_name","last_name"],
+                attributes:["id","first_name","last_name"],
                 where:{
-                    id:con_id
+                    id:con_id                    
                 },raw:true
             });
             //Object.assign({},name);
@@ -425,7 +450,7 @@ class User{
            // console.log(con_id);
             
             let name=await UserModel.findOne({
-                attributes:["first_name","last_name"],
+                attributes:["id","first_name","last_name"],
                 where:{
                     id:con_id
                 },raw:true
@@ -436,15 +461,72 @@ class User{
 
         }
 
-        
+                       
         profile.push(names);
 
-        //console.log(connections);
         //return records;
         //return user;
         //return mergeduser;
         return profile;
     }
+    async viewRequests(recipientId){
+        let connections = await ConnectionModel.findAll({
+            attributes:["requester_id"],
+            where:{[Op.and]:[{
+                recipient_id:recipientId
+            },{state:"pending"}]
+        },raw:true});
+        
+        var requests=[];
+
+        for (const y in connections){
+            let con_id=connections[y].requester_id;
+           
+            let name=await UserModel.findOne({
+                attributes:["first_name","last_name"],
+                where:{
+                    id:con_id
+                },raw:true
+            });
+            
+            requests.push(name);
+
+        }
+        return requests;
+    }
+
+    async getConnectionState(requesterId, recipientId){
+        let cnt1 = await ConnectionModel.count({where: {
+            [Op.and]: [
+                { recipient_id: recipientId },
+                { requester_id: requesterId },
+                { state:'pending'}
+            ] 
+        }})
+
+        let cnt2 = await ConnectionModel.count({where: {
+            [Op.and]: [
+                { recipient_id: recipientId },
+                { requester_id: requesterId },
+                { state:'accepted'}
+            ] 
+        }})
+
+        let message;
+
+        if(cnt1!=0){
+            message= "pending";
+        }
+        else if(cnt2!=0){
+             message =  "accepted";
+        }        
+        else{
+            message = "doesn't exists"
+        }
+        
+        return message;
+    }
+
 
 
 
@@ -463,7 +545,7 @@ module.exports = User;
 
 //user1.submitRecommendation(1,'recommnded').then(result => console.log('Recommendation Added: ', result));
 //user1.showRecommendation(1).then(result=>console.log('Recommendation Records: ',result));
-//user1.viewProfile(2).then(result=>console.log('Profile: ', result));
+//user1.viewProfile(33).then(result=>console.log('Profile: ', result));
 
 //user1.deleteAccount().then(result => console.log('Account Deleted: ', result));
 //user1.changePassword("123","456").then(result => console.log('Password Changed: ', result));;

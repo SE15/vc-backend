@@ -1,5 +1,6 @@
 const Guest= require("../services/guest");
 const db = require("../models/user-model");
+const rdb = require("../models/recommendation-model");
 const sequelize = require("../config/database");
 
 describe('createAccount', ()=> {
@@ -73,5 +74,31 @@ describe('searchUser', () => {
         const result = await exec();                
         expect(result).toEqual([]);
     
+    });
+});
+
+describe('viewProfile', ()=> {
+
+    let userId;
+    personal_arr
+
+    beforeEach(()=>{
+        sequelize.authenticate = jest.fn();
+        userId = 33;
+        personal_arr=[{ first_name: 'Oshan', last_name: 'Jayawardhana', profile_pic: '' }];
+            
+          
+
+    });
+
+    const exec = async()=>{
+        db.findAll = jest.fn().mockReturnValue(personal_arr); 
+        rdb.findAll = jest.fn().mockReturnValue();
+        const guest1 = new Guest();
+        return await guest1.viewProfile(userId);
+    };
+
+    it('should return an array if the profile is viewed successfully', async()=> {
+
     });
 });
