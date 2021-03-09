@@ -4,7 +4,9 @@ const { successMessage, errorMessage } = require("../utils/message-template");
 
 const getConnectionRequests = async (req, res, next) => {
     try {
-        const connections =  await user.viewRequests(req.user);
+        //const connections =  await user.viewRequests(req.user);
+        const connections =  await user.viewRequests(req.params.userid);
+        
         return successMessage(res, connections);
     } catch (error) {
         next(error);
@@ -13,7 +15,8 @@ const getConnectionRequests = async (req, res, next) => {
 
 const getConnectionStatus = async (req, res, next) => {
     try {
-        const state =  await user.getConnectionState(req.user, req.params.recipientid);
+        //const state =  await user.getConnectionState(req.user, req.params.recipientid);
+        const state =  await user.getConnectionState(req.params.userid, req.params.recipientid);
         return successMessage(res, state);
     } catch (error) {
         next(error);
@@ -23,7 +26,7 @@ const getConnectionStatus = async (req, res, next) => {
 const addConnection = async (req, res, next) => {
     try {
         //user id taken from authentication not from url but passes in url
-        let passedid = req.user;
+        let passedid = req.body.user;
         const userID = req.params.userid;
         const response = await user.addConnection(userID, passedid);
 
