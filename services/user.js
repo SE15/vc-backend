@@ -26,8 +26,7 @@ class User{
 
     static async createUser(id) {
         //gets the information from the database
-        let userInfo = await UserModel.findOne({where: {id: id}});
-        console.log(userInfo);
+        let userInfo = await UserModel.findOne({where: {id: id}});        
         return new User(userInfo);
     }
 
@@ -54,54 +53,55 @@ class User{
                     
             }
         });         
-        return user;
-        
+        return user;        
         
     }
     
-
-    async deleteAccount(passedid){
+    async deleteAccount(passedid) {
 
         //temp data
         this.user_id = passedid;
-        let deleteUser = await UserModel.update({ 
-                    
-            is_deleted: 1},{
-                where: {
-                    [Op.and]: [
-                    {id: this.user_id},
-                    {is_deleted:0}
-                    ]     
-        }});
-        let deleteSkills=await SkillModel.destroy({
-            where:{
-                user_id:this.user_id
+        let deleteUser = await UserModel.update({
+
+            is_deleted: 1
+        }, {
+            where: {
+                [Op.and]: [
+                    { id: this.user_id },
+                    { is_deleted: 0 }
+                ]
+            }
+        });
+        let deleteSkills = await SkillModel.destroy({
+            where: {
+                user_id: this.user_id
             }
         });
 
-        let deleteRecommendations=await RecommendationModel.destroy({
-            where:{
-                user_id:this.user_id,
+        let deleteRecommendations = await RecommendationModel.destroy({
+            where: {
+                user_id: this.user_id,
             }
         });
         let deleteConnections = await ConnectionModel.destroy({
-            where:{
-                [Op.or]:[
-                    {recipient_id:this.user_id},
-                {requester_id:this.user_id}
-            ]}
+            where: {
+                [Op.or]: [
+                    { recipient_id: this.user_id },
+                    { requester_id: this.user_id }
+                ]
+            }
         })
         //console.log(deleteSkills,deleteRecommendations);
 
-        if (deleteUser==1 && deleteSkills!=null && deleteRecommendations!=null&& deleteConnections!=null){
-            return true;   
-        }else{
+        if (deleteUser == 1 && deleteSkills != null && deleteRecommendations != null && deleteConnections != null) {
+            return true;
+        } else {
             return false;
         }
 
-        
-        
-             
+
+
+
     }
 
     async changePassword(oldPassword,newPassword,passedid){
@@ -114,13 +114,15 @@ class User{
         if(hashPassword === md5(oldPassword)){
             await UserModel.update({ 
                     
-                password: updatePassword},{
-                    where: {
-                        [Op.and]: [
-                        {id: this.user_id},
-                        {is_deleted:0}
-                        ]     
-            }});
+                password: updatePassword
+            }, {
+                where: {
+                    [Op.and]: [
+                        { id: this.user_id },
+                        { is_deleted: 0 }
+                    ]
+                }
+            });
             return true;        
 
         }else{
@@ -151,65 +153,71 @@ class User{
               })
             return true;
             
-        }else if(first_name!=undefined && last_name==undefined && profile_pic==undefined){
-            await UserModel.update({ 
-                first_name:first_name }, {
+        } else if (first_name != undefined && last_name == undefined && profile_pic == undefined) {
+            await UserModel.update({
+                first_name: first_name
+            }, {
                 where: {
-                    id:this.user_id
+                    id: this.user_id
                 }
-              });
+            });
             return true;
 
         }else if(first_name!=undefined && last_name!=undefined && profile_pic==undefined){
             await UserModel.update({ 
                 first_name:first_name , 
-                last_name:last_name}, {
+                last_name:last_name
+            }, {
                 where: {
                     id:this.user_id
                 }
-              })
+            })
             return true;
 
         }else if(first_name==undefined && last_name!=undefined && profile_pic!=undefined){
             await UserModel.update({  
                 last_name:last_name,
-                profile_pic:profile_pic}, {
+                profile_pic:profile_pic
+            }, {
                 where: {
                     id:this.user_id
                 }
-              })
+            })
             return true;
 
         }else if(first_name==undefined && last_name==undefined && profile_pic!=undefined){
             await UserModel.update({ 
-                profile_pic:profile_pic}, {
+                profile_pic:profile_pic
+            }, {
                 where: {
                     id:this.user_id
                 }
-              })
+            })
             return true;
 
         }else if(first_name==undefined && last_name!=undefined && profile_pic==undefined){
             await UserModel.update({  
-                last_name:last_name}, {
+                last_name:last_name
+            }, {
                 where: {
                     id:this.user_id
                 }
-              })
+            })
             return true;
 
         }else if(first_name!=undefined && last_name!=undefined && profile_pic!=undefined){
             await UserModel.update({ 
                 first_name:first_name,
-            profile_pic:profile_pic}, {
+                profile_pic:profile_pic
+            }, {
                 where: {
                     id:this.user_id
                 }
-              })
+            })
             return true;
             
         }
-        }
+    }
 
         /*method for all attributes passes when editing profile
         async editProfile(details){
@@ -240,7 +248,7 @@ class User{
         if(checkin===true){
                     
             let connection = new Connection({requester_id: this.requester_id, recipient_id: recipient_id});
-            return await connection.saveToDatabase(true);
+            return await connection.saveToDatabase();
             
             //return connection;
        
@@ -268,13 +276,15 @@ class User{
         let recipi_id=this.recipient_id;
         let res = null;
     
-        let cnt2 = await ConnectionModel.count({where: {
-            [Op.and]: [
-                { requester_id: requester_id },
-                { recipient_id: recipi_id },
-                { state:'pending'}
-            ] 
-        }})
+        let cnt2 = await ConnectionModel.count({
+            where: {
+                [Op.and]: [
+                    { requester_id: requester_id },
+                    { recipient_id: recipi_id },
+                    { state: 'pending' }
+                ]
+            }
+        })
         
         if(cnt2 > 0){
             res = await Connection.updateState(recipi_id,requester_id,accept);
@@ -347,97 +357,97 @@ class User{
         
     }
 
-    async viewProfile(user_id){
-       
-        const user=await UserModel.findAll({
-            attributes:['first_name','last_name','profile_pic'], raw: true,
-            where:{[Op.and]:
-                [{id:`${user_id}`,is_deleted:0}]
-                    
+    async viewProfile(user_id, passedid) {
+
+        const user = await UserModel.findAll({
+            attributes: ['id', 'first_name', 'last_name', 'profile_pic'], raw: true,
+            where: {
+                [Op.and]:
+                    [{ id: `${user_id}`, is_deleted: 0 }]
+
             }
-    
-            });
-       
-        const records= await RecommendationModel.findAll({
-            attributes:['Recommended_by','description'], raw: true,
-            where:
-                [{user_id:`${user_id}`}]
+
         });
-        var recommendations=[]
-        for (const i in records){
-            let recommended_by= records[i].Recommended_by;
-            let description=records[i].description;
 
-            let recommended_name=await UserModel.findOne({
-            attributes:["first_name","last_name"],
-            where:{id:recommended_by},raw:true
+        const records = await RecommendationModel.findAll({
+            attributes: ['Recommended_by', 'description'], raw: true,
+            where:
+                [{ user_id: `${user_id}` }]
+        });
+        var recommendations = []
+        for (const i in records) {
+            let recommended_by = records[i].Recommended_by;
+            let description = records[i].description;
+
+            let recommended_name = await UserModel.findOne({
+                attributes: ["id", "first_name", "last_name", "profile_pic"],
+                where: { id: recommended_by }, raw: true
             });
 
-            recommended_name.description=description;
+            recommended_name.description = description;
             recommendations.push(recommended_name);
 
         }
-    
-        const skills=await SkillModel.findAll({
-            attributes:['id','name','validations'], raw: true,
+
+        let skills = await SkillModel.findAll({
+            attributes: ['id', 'name', 'validations'], raw: true,
             where:
-                [{user_id:`${user_id}`}],
+                [{ user_id: `${user_id}` }]
         });
 
-        
-        for(const j in skills){
-                let skillid=skills[j].id;
-                let validated=await ValidationModel.findAll({
-                    attributes:["validated_by"],
-                    where:{
-                        skill_id:skillid
-                    },raw:true
+        const skillIds = skills.map(skill => skill.id);
 
-                    
-                });
-                let validatedby_arr=[];
+        let alreadyValidatedSkills = await ValidationModel.findAll({
+            attributes: ['skill_id'], raw: true,
+            where: {
+                [Op.and]:
+                    [{ validated_by: passedid, skill_id: skillIds }]
+            }
+        });
+        alreadyValidatedSkills = alreadyValidatedSkills.map(skill => skill.skill_id);
 
-                for (const k in validated){
-                    let validated_id=validated[k].validated_by;
-                    validatedby_arr.push(validated_id);
-                }
-                //console.log(validatedby_arr)
-                var arr=validatedby_arr.toString();
-                skills[j].validated_by=arr;
+        skills = skills.map(skill => {
+            console.log(skill.id, alreadyValidatedSkills)
+            const alreadyValidated = alreadyValidatedSkills.includes(skill.id);
+            return {...skill, alreadyValidated };
+        })
 
-        }
+        console.log(skills);
 
-
-        var profile=[];
+        var profile = [];
         profile.push(user);
         profile.push(skills);
         profile.push(recommendations);
 
         let connections1 = await ConnectionModel.findAll({
-            attributes:["requester_id"],
-            where:{[Op.and]:[{
-                recipient_id:user_id
-            },{state:"accepted"}]
-        },raw:true});
+            attributes: ["requester_id"],
+            where: {
+                [Op.and]: [{
+                    recipient_id: user_id
+                }, { state: "accepted" }]
+            }, raw: true
+        });
 
         let connections2 = await ConnectionModel.findAll({
-            attributes:["recipient_id"],
-            where:{[Op.and]:[{
-                requester_id:user_id
-            },{state:"accepted"}]
-        },raw:true});
+            attributes: ["recipient_id"],
+            where: {
+                [Op.and]: [{
+                    requester_id: user_id
+                }, { state: "accepted" }]
+            }, raw: true
+        });
 
-        var names=[];
+        var names = [];
 
-        for (const x in connections1){
-            let con_id=connections1[x].requester_id;
-           // console.log(con_id);
-            
-            let name=await UserModel.findOne({
-                attributes:["id","first_name","last_name"],
-                where:{
-                    id:con_id                    
-                },raw:true
+        for (const x in connections1) {
+            let con_id = connections1[x].requester_id;
+            // console.log(con_id);
+
+            let name = await UserModel.findOne({
+                attributes: ["id", "first_name", "last_name", "profile_pic"],
+                where: {
+                    id: con_id
+                }, raw: true
             });
             //Object.assign({},name);
 
@@ -445,15 +455,15 @@ class User{
 
         }
 
-        for (const y in connections2){
-            let con_id=connections2[y].recipient_id;
-           // console.log(con_id);
-            
-            let name=await UserModel.findOne({
-                attributes:["id","first_name","last_name"],
-                where:{
-                    id:con_id
-                },raw:true
+        for (const y in connections2) {
+            let con_id = connections2[y].recipient_id;
+            // console.log(con_id);
+
+            let name = await UserModel.findOne({
+                attributes: ["id", "first_name", "last_name", "profile_pic"],
+                where: {
+                    id: con_id
+                }, raw: true
             });
             //console.log(name);
             //Object.assign({},name);
@@ -461,81 +471,107 @@ class User{
 
         }
 
-                       
+
         profile.push(names);
 
+        //console.log(connections);
         //return records;
         //return user;
         //return mergeduser;
         return profile;
     }
-    async viewRequests(recipientId){
+    async viewRequests(recipientId) {
         let connections = await ConnectionModel.findAll({
-            attributes:["requester_id"],
-            where:{[Op.and]:[{
-                recipient_id:recipientId
-            },{state:"pending"}]
-        },raw:true});
-        
-        var requests=[];
+            attributes: ["requester_id"],
+            where: {
+                [Op.and]: [{
+                    recipient_id: recipientId
+                }, { state: "pending" }]
+            }, raw: true
+        });
 
-        for (const y in connections){
-            let con_id=connections[y].requester_id;
-           
-            let name=await UserModel.findOne({
-                attributes:["first_name","last_name"],
-                where:{
-                    id:con_id
-                },raw:true
+        var requests = [];
+
+        for (const y in connections) {
+            let con_id = connections[y].requester_id;
+
+            let name = await UserModel.findOne({
+                attributes: ["id", "first_name", "last_name", "profile_pic"],
+                where: {
+                    id: con_id
+                }, raw: true
             });
-            
+
             requests.push(name);
 
         }
         return requests;
     }
 
-    async getConnectionState(requesterId, recipientId){
-        let cnt1 = await ConnectionModel.count({where: {
-            [Op.and]: [
-                { recipient_id: recipientId },
-                { requester_id: requesterId },
-                { state:'pending'}
-            ] 
-        }})
+    async getConnectionState(requesterId, recipientId) {
+        let cnt1 = await ConnectionModel.count({
+            where: {
+                [Op.or]: [
+                    {
+                        [Op.and]: [
+                            { recipient_id: recipientId },
+                            { requester_id: requesterId },
+                            { state: 'pending' }
+                        ]
+                    },
+                    {
+                        [Op.and]: [
+                            { recipient_id: requesterId },
+                            { requester_id: recipientId },
+                            { state: 'pending' }
+                        ]
+                    }
+                ]
+            }
+        })
 
-        let cnt2 = await ConnectionModel.count({where: {
-            [Op.and]: [
-                { recipient_id: recipientId },
-                { requester_id: requesterId },
-                { state:'accepted'}
-            ] 
-        }})
+        let cnt2 = await ConnectionModel.count({
+            where: {
+                [Op.or]: [
+                    {
+                        [Op.and]: [
+                            { recipient_id: recipientId },
+                            { requester_id: requesterId },
+                            { state: 'accepted' }
+                        ]
+                    },
+                    {
+                        [Op.and]: [
+                            { recipient_id: requesterId },
+                            { requester_id: recipientId },
+                            { state: 'accepted' }
+                        ]
+                    }
+                ]
+            }
+        })
 
         let message;
 
-        if(cnt1!=0){
-            message= "pending";
+        if (cnt1 != 0) {
+            message = "pending";
         }
-        else if(cnt2!=0){
-             message =  "accepted";
-        }        
-        else{
-            message = "doesn't exists"
+        else if (cnt2 != 0) {
+            message = "accepted";
         }
-        
+        else {
+            message = "none"
+        }
         return message;
     }
 
 
 
 
-
-    
 }
 module.exports = User;
 //user1=new User();
-//user1.addConnection(null,null).then(result => console.log('Connection Added: ', result));
+//user1.addConnection(11).then(result => console.log('Connection Added: ', result));
 //user1.removeConnection(11).then(result => console.log('Connection Removed: ', result));
 //user1.respondConnection(32,true).then(result => console.log('Connection state updated: ', result));
 
@@ -545,7 +581,7 @@ module.exports = User;
 
 //user1.submitRecommendation(1,'recommnded').then(result => console.log('Recommendation Added: ', result));
 //user1.showRecommendation(1).then(result=>console.log('Recommendation Records: ',result));
-//user1.viewProfile(33).then(result=>console.log('Profile: ', result));
+//user1.viewProfile(2).then(result=>console.log('Profile: ', result));
 
 //user1.deleteAccount().then(result => console.log('Account Deleted: ', result));
 //user1.changePassword("123","456").then(result => console.log('Password Changed: ', result));;
@@ -554,3 +590,6 @@ module.exports = User;
 //user1.viewEvent(1).then(result=>console.log("Event Details: ",result));
 
 //user1.searchUser("Lahiru").then(result=>console.log("Search Details: ",result));
+//user1.viewRequests(2).then(result=>console.log("Requests: ",result));
+//user1.getConnectionState(33,21).then(result=>console.log("State: ",result));
+//user1.getConnectedId(21).then(result=>console.log("ID: ",result));

@@ -10,27 +10,24 @@ class Connection {
         
     }
 
-    async saveToDatabase(isNew, t = null){
+    async saveToDatabase(){
         //adding a new connection to the database
-        
-        if (isNew == true) { 
-            
             await ConnectionModel.create({ 
                 requester_id: this.requester_id,
                 recipient_id: this.recipient_id,
-                state:"pending"}, { transaction: t });
+                state:"pending"});
                    
             let result = await ConnectionModel.findOne({where: {
                 [Op.and]: [
                     { requester_id: this.requester_id },
                     { recipient_id: this.recipient_id }
-            ]}}, { transaction: t });                        
+            ]}});                        
             this.state = result.state; 
                           
         return true; 
         
         
-        }
+        
     }
 
     async destroy() {
@@ -56,13 +53,13 @@ class Connection {
             {requester_id: reque_id},
             {recipient_id: recipient_id}
             ]}});
-
+          
         let connectionInfo2 = await ConnectionModel.findOne({where: {
             [Op.and]: [
             {requester_id: recipient_id},
             {recipient_id: reque_id}
             ]}});
-
+            
         if (connectionInfo1 ===null )  {
              connectionInfo = connectionInfo2;
         }else{
@@ -88,13 +85,14 @@ class Connection {
             ] 
         }})
         
+        
         if (cnt1 === 0 && cnt2===0) {
-                
-            try {
+             return true;   
+            /*try {
                 return true; 
             } catch(err) {
                 throw err;
-            }
+            }*/
         } else {
             return false;
             //if(cnt1!=0){

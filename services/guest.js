@@ -5,7 +5,8 @@ const md5 = require('md5');
 const RecommendationModel = require('../models/recommendation-model');
 const SkillModel = require('../models/skill-model');
 const ConnectionModel = require('../models/connection-model');
-const ValidationModel=require('../models/validation-model');
+const ValidationModel = require('../models/validation-model');
+//const { login } = require('../controllers/auth-controller');
 
 
 class Guest{
@@ -13,10 +14,11 @@ class Guest{
     constructor(){
         try {
             sequelize.authenticate();
-            console.log('Connection has been established successfully.');
+            //console.log('Connection has been established successfully.');
         } catch (error) {
-            console.error('Unable to connect to the database:', error);
-        }
+            //console.error('Unable to connect to the database:', error);
+            
+        } 
     }
 
     async  createAccount(info) {
@@ -61,9 +63,9 @@ class Guest{
     async searchUser(name){
     
         const user=UserModel.findAll({
-            attributes:['first_name','last_name','profile_pic'], raw: true,
+            attributes:['id','first_name','last_name','profile_pic'], raw: true,
             where:{
-                [Op.or]:[{first_name: `${name}`,is_deleted:0},{last_name: `${name}`, is_deleted:0}]
+                [Op.or]:[{first_name: {[Op.substring]: name},is_deleted:0},{last_name: {[Op.substring]: name}, is_deleted:0}]
                     
             }
         });
@@ -71,97 +73,97 @@ class Guest{
     
     } 
 
-    async viewProfile(user_id){
-       
-        const user=await UserModel.findAll({
-            attributes:['first_name','last_name','profile_pic'], raw: true,
-            where:{[Op.and]:
-                [{id:`${user_id}`,is_deleted:0}]
-                    
+    async viewProfile(user_id, passedid) {
+
+        const user = await UserModel.findAll({
+            attributes: ['id', 'first_name', 'last_name', 'profile_pic'], raw: true,
+            where: {
+                [Op.and]:
+                    [{ id: `${user_id}`, is_deleted: 0 }]
+
             }
-    
-            });
-       
-        const records= await RecommendationModel.findAll({
-            attributes:['Recommended_by','description'], raw: true,
-            where:
-                [{user_id:`${user_id}`}]
+
         });
-        var recommendations=[]
-        for (const i in records){
-            let recommended_by= records[i].Recommended_by;
-            let description=records[i].description;
 
-            let recommended_name=await UserModel.findOne({
-            attributes:["first_name","last_name"],
-            where:{id:recommended_by},raw:true
+        const records = await RecommendationModel.findAll({
+            attributes: ['Recommended_by', 'description'], raw: true,
+            where:
+                [{ user_id: `${user_id}` }]
+        });
+        var recommendations = []
+        for (const i in records) {
+            let recommended_by = records[i].Recommended_by;
+            let description = records[i].description;
+
+            let recommended_name = await UserModel.findOne({
+                attributes: ["id", "first_name", "last_name", "profile_pic"],
+                where: { id: recommended_by }, raw: true
             });
 
-            recommended_name.description=description;
+            recommended_name.description = description;
             recommendations.push(recommended_name);
 
         }
-    
-        const skills=await SkillModel.findAll({
-            attributes:['id','name','validations'], raw: true,
+
+        let skills = await SkillModel.findAll({
+            attributes: ['id', 'name', 'validations'], raw: true,
             where:
-                [{user_id:`${user_id}`}],
+                [{ user_id: `${user_id}` }]
         });
 
+        const skillIds = skills.map(skill => skill.id);
+
+        let alreadyValidatedSkills = await ValidationModel.findAll({
+            attributes: ['skill_id'], raw: true,
+            where: {
+                [Op.and]:
+                    [{ validated_by: passedid, skill_id: skillIds }]
+            }
+        });
+        alreadyValidatedSkills = alreadyValidatedSkills.map(skill => skill.skill_id);
         
-        for(const j in skills){
-                let skillid=skills[j].id;
-                let validated=await ValidationModel.findAll({
-                    attributes:["validated_by"],
-                    where:{
-                        skill_id:skillid
-                    },raw:true
+        skills = skills.map(skill => {
+            console.log(skill.id, alreadyValidatedSkills)
+            const alreadyValidated = alreadyValidatedSkills.includes(skill.id);
+            return {...skill, alreadyValidated };
+        })
 
-                    
-                });
-                let validatedby_arr=[];
+        console.log(skills);
 
-                for (const k in validated){
-                    let validated_id=validated[k].validated_by;
-                    validatedby_arr.push(validated_id);
-                }
-                //console.log(validatedby_arr)
-                var arr=validatedby_arr.toString();
-                skills[j].validated_by=arr;
-
-        }
-
-
-        var profile=[];
+        var profile = [];
         profile.push(user);
         profile.push(skills);
         profile.push(recommendations);
 
         let connections1 = await ConnectionModel.findAll({
-            attributes:["requester_id"],
-            where:{[Op.and]:[{
-                recipient_id:user_id
-            },{state:"accepted"}]
-        },raw:true});
-
+            attributes: ["requester_id"],
+            where: {
+                [Op.and]: [{
+                    recipient_id: user_id
+                }, { state: "accepted" }]
+            }, raw: true
+        });
+        
         let connections2 = await ConnectionModel.findAll({
-            attributes:["recipient_id"],
-            where:{[Op.and]:[{
-                requester_id:user_id
-            },{state:"accepted"}]
-        },raw:true});
+            attributes: ["recipient_id"],
+            where: {
+                [Op.and]: [{
+                    requester_id: user_id
+                }, { state: "accepted" }]
+            }, raw: true
+        });
+        
+        var names = [];
 
-        var names=[];
+        for (const x in connections1) {
+            let con_id = connections1[x].requester_id;
+            // console.log(con_id);
 
-        for (const x in connections1){
-            let con_id=connections1[x].requester_id;
-           // console.log(con_id);
-            
-            let name=await UserModel.findOne({
-                attributes:["id","first_name","last_name"],
-                where:{
-                    id:con_id                    
-                },raw:true
+            let name = await UserModel.findOne({
+                attributes: ["id", "first_name", "last_name", "profile_pic"],
+                where: {
+                    id: con_id
+                }, raw: true
             });
             //Object.assign({},name);
 
@@ -169,15 +171,15 @@ class Guest{
 
         }
 
-        for (const y in connections2){
-            let con_id=connections2[y].recipient_id;
-           // console.log(con_id);
-            
-            let name=await UserModel.findOne({
-                attributes:["id","first_name","last_name"],
-                where:{
-                    id:con_id
-                },raw:true
+        for (const y in connections2) {
+            let con_id = connections2[y].recipient_id;
+            // console.log(con_id);
+
+            let name = await UserModel.findOne({
+                attributes: ["id", "first_name", "last_name", "profile_pic"],
+                where: {
+                    id: con_id
+                }, raw: true
             });
             //console.log(name);
             //Object.assign({},name);
@@ -185,26 +187,31 @@ class Guest{
 
         }
 
-        
+
         profile.push(names);
 
+        //console.log(connections);
         //return records;
         //return user;
         //return mergeduser;
         return profile;
     }
 
+
     async getUser(email){
         
 
         const login_id = await UserModel.findOne({
             arrtibute:["id"],
-            where:{
-                email:email
+            where:{[Op.and]:
+                [{email:email,is_deleted:0}]
+                    
             },raw:true
         });
-
         
+
+        if (login_id === null) throw new Error('Invalid email or password');
+
         let user_id= login_id.id;
        
         const user=await UserModel.findAll({
@@ -215,7 +222,7 @@ class Guest{
             }
     
             });
-       
+        
         const records= await RecommendationModel.findAll({
             attributes:['Recommended_by','description'], raw: true,
             where:
@@ -227,7 +234,7 @@ class Guest{
             let description=records[i].description;
 
             let recommended_name=await UserModel.findOne({
-            attributes:["first_name","last_name"],
+            attributes:["first_name","last_name","profile_pic"],
             where:{id:recommended_by},raw:true
             });
 
@@ -241,7 +248,7 @@ class Guest{
             where:
                 [{user_id:user_id}]
         });
-
+        
         var profile=[];
         profile.push(user);
         profile.push(skills);
@@ -268,7 +275,7 @@ class Guest{
            // console.log(con_id);
             
             let name=await UserModel.findOne({
-                attributes:["first_name","last_name"],
+                attributes:["first_name","last_name","profile_pic"],
                 where:{
                     id:con_id
                 },raw:true
@@ -284,7 +291,7 @@ class Guest{
            // console.log(con_id);
             
             let name=await UserModel.findOne({
-                attributes:["first_name","last_name"],
+                attributes:["first_name","last_name","profile_pic"],
                 where:{
                     id:con_id
                 },raw:true
@@ -314,5 +321,5 @@ module.exports=Guest;
 //guest1 = new Guest();
 //guest1.searchUser("Lahiru").then(result => console.log('Connection Added: ', result));
 //guest1.createAccount([{first_name: "Lahiru" ,last_name: "Madhushan", email:'lahiru1@gmail.com', password:'abc'}]).then(result => console.log('Account Creation: ', result));
-//guest1.viewProfile(33).then(result => console.log('Profile Status: ', result));
+//guest1.viewProfile(2).then(result => console.log('Profile Status: ', result));
 //guest1.getUser("sanga@gmail.com").then(result => console.log('Connection Added: ', result));
