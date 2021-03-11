@@ -27,7 +27,7 @@ class Recommendation {
             attributes:['Recommended_by','description'], raw: true,
             where:
                 [{user_id: this.user_id}]
-                    
+                   
             
         })
         if(records){
@@ -47,6 +47,7 @@ class Recommendation {
                 ]
             }
         })
+
 
         if (record){
             return false;

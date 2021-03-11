@@ -24,11 +24,11 @@ class User{
         }
     }
 
-    static async createUser(id) {
+    /*static async createUser(id) {
         //gets the information from the database
         let userInfo = await UserModel.findOne({where: {id: id}});              
         return new User(userInfo);
-    }
+    }*/
 
 
     

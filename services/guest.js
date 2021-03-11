@@ -128,7 +128,7 @@ class Guest{
             return {...skill, alreadyValidated };
         })
 
-        console.log(skills);
+        //console.log(skills);
 
         var profile = [];
         profile.push(user);
