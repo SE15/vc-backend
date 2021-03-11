@@ -296,6 +296,135 @@ describe('viewProfile', ()=> {
     });
 });
 
+describe('showRecommendation Test', () => {
+ 
+    beforeEach(()=>{
+        sequelize.authenticate = jest.fn();
+    });
+ 
+    it("should return an array of user's recommendations if recommendations are available", async()=>{
+        rdb.findAll = jest.fn().mockReturnValue([{recommended_by:2,description:'Amazing'}]) ;
+            
+        const user1 = new User();
+        const result=await user1.showRecommendation(33);
+        expect(result).toEqual([{recommended_by:2,description:'Amazing'}]);
+    
+    });
+
+    it('should return false if there is an error with show recommendations', async()=>{
+        rdb.findAll = jest.fn().mockReturnValue(null) ;
+            
+        const user1 = new User();
+        const result=await user1.showRecommendation(11);
+        expect(result).toEqual(false);
+    
+    });
+});
+
+describe('submitRecommendation', () => {
+ 
+    beforeEach(()=>{
+        sequelize.authenticate = jest.fn();
+    });
+ 
+    it('should return a message if already recommended', async()=>{
+        rdb.findOne = jest.fn().mockReturnValue([{user_id:11,recommended_by:2}]) ;
+            
+        const user1 = new User();
+        const result=await user1.submitRecommendation(2,11,"Amazing");
+        expect(result).toEqual("Already Recommended");
+    
+    });
+
+    it('should return true if recomendation is for the first time', async()=>{
+        rdb.findOne = jest.fn().mockReturnValue(null) ;
+        rdb.create = jest.fn().mockReturnValue(true) ;
+            
+        const user1 = new User();
+        const result=await user1.submitRecommendation(2,11,"Amazing");
+        expect(result).toEqual(true);
+    
+    });
+});
+
+describe('editProfile', () => {
+ 
+    beforeEach(()=>{
+        sequelize.authenticate = jest.fn();
+    });
+ 
+    it('should return false if no edit details', async()=>{
+
+        const user1 = new User();
+        const result=await user1.editProfile({},1);
+        expect(result).toEqual(false);
+    
+    });
+
+    it('should return true if all 3 detailes are editing', async()=>{
+        db.update = jest.fn().mockReturnValue() ;
+            
+        const user1 = new User();
+        const result=await user1.editProfile({first_name:'dinesh',last_name:'chandimal',profile_pic:"123"},1);        
+        expect(result).toEqual(true);
+    
+    });
+
+    it('should return true if only first name is editing', async()=>{
+        db.update = jest.fn().mockReturnValue() ;
+            
+        const user1 = new User();
+        const result=await user1.editProfile({first_name:'dinesh'},1);
+        expect(result).toEqual(true);
+    
+    });
+
+    it('should return true if only first name and last name is editing', async()=>{
+        db.update = jest.fn().mockReturnValue() ;
+            
+        const user1 = new User();
+        const result=await user1.editProfile({first_name:'dinesh',last_name:'chandimal'},1);
+        expect(result).toEqual(true);
+    
+    });
+
+    it('should return true if only last name  and profile picture is editing', async()=>{
+        db.update = jest.fn().mockReturnValue() ;
+            
+        const user1 = new User();
+        const result=await user1.editProfile({last_name:'chandimal',profile_pic:"123"},1);
+        expect(result).toEqual(true);
+    
+    });
+
+    it('should return true if only profile picture is editing', async()=>{
+        db.update = jest.fn().mockReturnValue() ;
+            
+        const user1 = new User();
+        const result=await user1.editProfile({profile_pic:"123"},1);
+        expect(result).toEqual(true);
+    
+    });
+
+    it('should return true if only last name picture is editing', async()=>{
+        db.update = jest.fn().mockReturnValue() ;
+            
+        const user1 = new User();
+        const result=await user1.editProfile({last_name:'chandimal'},1);
+        expect(result).toEqual(true);
+    
+    });
+
+    it('should return true if only last name  and first name is editing', async()=>{
+        db.update = jest.fn().mockReturnValue() ;
+            
+        const user1 = new User();
+        const result=await user1.editProfile({first_name:'dinesh',last_name:"chandimal"},1);
+        expect(result).toEqual(true);
+    
+    });
+});
+
 
 
 
