@@ -161,7 +161,7 @@ describe('viewProfile', ()=> {
         expect(result).toContainEqual(con_arr);    
     });
 
-    it('should return an array if the profile is viewed successfully and checks whether the each connection is received by the user', async()=> {
+    it('should return an array if the profile is viewed successfully and checks whether the each connection is received to the user', async()=> {
         connections1=[{ requester_id: 6 } ];
         connections2=[];
         const result = await exec();                               
@@ -245,7 +245,7 @@ describe('getUser', ()=>{
         expect(result).toContainEqual(con_arr);    
     });
 
-    it('should return an array if it gets the profile info successfully and checks whether the each connection is received by the user', async()=> {
+    it('should return an array if it gets the profile info successfully and checks whether the each connection is received to the user', async()=> {
         connections1=[{ requester_id: 6 } ];
         connections2=[];
         const result = await exec();                               
