@@ -26,7 +26,7 @@ class User{
 
     static async createUser(id) {
         //gets the information from the database
-        let userInfo = await UserModel.findOne({where: {id: id}});        
+        let userInfo = await UserModel.findOne({where: {id: id}});              
         return new User(userInfo);
     }
 
@@ -489,7 +489,7 @@ class User{
                 }, { state: "pending" }]
             }, raw: true
         });
-
+        
         var requests = [];
 
         for (const y in connections) {
@@ -501,12 +501,13 @@ class User{
                     id: con_id
                 }, raw: true
             });
-
+            
             requests.push(name);
 
         }
         return requests;
     }
+
 
     async getConnectionState(requesterId, recipientId) {
         let cnt1 = await ConnectionModel.count({
@@ -593,3 +594,4 @@ module.exports = User;
 //user1.viewRequests(2).then(result=>console.log("Requests: ",result));
 //user1.getConnectionState(33,21).then(result=>console.log("State: ",result));
 //user1.getConnectedId(21).then(result=>console.log("ID: ",result));
+

@@ -483,7 +483,134 @@ describe('deleteAccount', () => {
 
 });
 
+describe('viewRequests', ()=> {
 
+    let recipientId, connections ,name;
+
+    const exec = async()=>{
+        cdb.findAll = jest.fn().mockReturnValue(connections);
+        db.findOne = jest.fn().mockReturnValue(name);
+        const user1 = new User();
+        return await user1.viewRequests(recipientId);
+    }    
+
+    beforeEach(()=>{
+        sequelize.authenticate = jest.fn();
+        recipientId=2;
+        connections=[ { requester_id: 33 } ];
+        name={id: 33, first_name: 'Oshan', last_name: 'Jayawardhana', profile_pic: ''};
+    });
+
+    it('should return an array containing all the requests if the user has any requests', async()=>{
+        const result = await exec();                                       
+        expect(result).toContainEqual(name);
+    });
+
+    it('should return an empty array if the user has not received any requests', async()=>{
+        recipientId=33;
+        connections=[];        
+        const result = await exec();                                       
+        expect(result).toEqual([]);
+    });
+});
+
+describe('getConnectionState', ()=> {
+
+    let cnt1, cnt2, requesterId, recipientId;
+
+    const exec = async()=>{
+        cdb.count = jest.fn().mockReturnValueOnce(cnt1).mockReturnValueOnce(cnt2);
+        const user1 = new User();
+        return await user1.getConnectionState(requesterId, recipientId);
+    }    
+
+    beforeEach(()=>{
+        sequelize.authenticate = jest.fn();
+        cnt1=1;
+        cnt2=0;
+        requesterId=33;
+        recipientId=2;
+    });
+
+    it("it should return 'pending' if the corresponding connection is at the pending state", async()=>{
+        const result = await exec();                                       
+        expect(result).toMatch(/pending/);
+    });
+
+    it("it should return 'accepted' if the corresponding connection is at the accepted state", async()=>{
+        cnt1=0;
+        cnt2=1;
+        requesterId=62;
+        recipientId=6;
+        const result = await exec();                                       
+        expect(result).toMatch(/accepted/);
+    });
+
+    it("it should return 'none' if such connection does not exist", async()=>{
+        cnt1=0;
+        cnt2=0;
+        requesterId=11;
+        recipientId=21;
+        const result = await exec();                                       
+        expect(result).toMatch(/none/);
+    });
+});
+
+describe('getAllUsers', ()=>{
+
+    let users, obj;
+    const exec = async()=>{
+        db.findAll = jest.fn().mockReturnValue([obj]);
+        const user1 = new User();
+        return await user1.getAllUsers();
+    }    
+
+    beforeEach(()=>{
+        sequelize.authenticate = jest.fn();
+        obj={
+            first_name: 'Lahiru',
+            last_name: 'Madhushan',
+            email: 'cha@gmail.com',
+            profile_pic: ''
+          },
+          {
+            first_name: 'Oshani',
+            last_name: 'Weerasinghe',
+            email: 'lasath@gmail.com',
+            profile_pic: ''
+          },
+          {
+            first_name: 'Mahela',
+            last_name: 'sangakkara',
+            email: 'sanga@gmail.com',
+            profile_pic: '5678'
+          },
+          {
+            first_name: 'Kusall',
+            last_name: 'Menda',
+            email: 'mendis@gmail.com',
+            profile_pic: ''
+          },
+          {
+            first_name: 'Oshan',
+            last_name: 'Jayawardhana',
+            email: 'oshan@gmail.com',
+            profile_pic: ''
+          },
+          {
+            first_name: 'Mahela',
+            last_name: 'jayawardhana',
+            email: 'mahela@gmail.com',
+            profile_pic: ''
+          };
+              
+    });
+
+    it('should return an array containing all user objects',async()=> {
+        const result = await exec();                                       
+        expect(result).toContainEqual(obj);
+    });
+});
 
 
 
