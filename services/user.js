@@ -205,7 +205,7 @@ class User{
             })
             return true;
 
-        }else if(first_name!=undefined && last_name!=undefined && profile_pic!=undefined){
+        }else {
             await UserModel.update({ 
                 first_name:first_name,
                 profile_pic:profile_pic

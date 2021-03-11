@@ -240,12 +240,17 @@ describe('viewProfile', ()=> {
     let con_arr;
     let re_arr;
     let passedId;
+    let alreadyValidatedSkills;
+    let connections1, connections2;
     
 
     beforeEach(()=>{
         sequelize.authenticate = jest.fn();
         userId = 33;
         passedId = 10;
+        connections1=[];
+        connections2=[{ recipient_id: 6 } ];
+        alreadyValidatedSkills=[];
         personal_arr=[{id:33, first_name: 'Oshan', last_name: 'Jayawardhana', profile_pic: '' }];
         recommendation_arr= [
             { Recommended_by: 2, description: 'Amazing ' },
@@ -281,13 +286,33 @@ describe('viewProfile', ()=> {
         rdb.findAll = jest.fn().mockReturnValue(recommendation_arr);        
         db.findOne = jest.fn().mockReturnValueOnce(arr1).mockReturnValueOnce(arr2).mockReturnValueOnce({ id: 6, first_name: 'Danushka', last_name: 'Gunathilake' });                
         sdb.findAll = jest.fn().mockReturnValue(skill_arr);
-        cdb.findAll = jest.fn().mockReturnValueOnce([]).mockReturnValueOnce([{ recipient_id: 6 } ]);
-        vdb.findAll = jest.fn().mockReturnValue([]);
+        cdb.findAll = jest.fn().mockReturnValueOnce(connections1).mockReturnValueOnce(connections2);
+        vdb.findAll = jest.fn().mockReturnValue(alreadyValidatedSkills);
         const user1 = new User();
         return await user1.viewProfile(userId,passedId);
     };
 
-    it('should return an array if the profile is viewed successfully', async()=> {
+    it('should return an array if the profile is viewed successfully and checks whether the each connection is sent by the user', async()=> {
+        const result = await exec();                               
+        expect(result).toContainEqual(personal_arr);
+        expect(result).toContainEqual(re_arr);
+        expect(result).toContainEqual(skill_arr);  
+        expect(result).toContainEqual(con_arr);    
+    });
+
+    it('should return an array if the profile is viewed successfully and checks whether the each connection is received to the user', async()=> {
+        connections1=[{ recipient_id: 6 } ];
+        connections2=[];
+        const result = await exec();                               
+        expect(result).toContainEqual(personal_arr);
+        expect(result).toContainEqual(re_arr);
+        expect(result).toContainEqual(skill_arr);  
+        expect(result).toContainEqual(con_arr);    
+    });
+
+    it('should return an array if the profile is viewed successfully and checks whether the current user already validated the skills', async()=> {
+        passeId=26;
+        alreadyValidatedSkills=[146];
         const result = await exec();                               
         expect(result).toContainEqual(personal_arr);
         expect(result).toContainEqual(re_arr);
@@ -415,14 +440,47 @@ describe('editProfile', () => {
     
     });
 
-    it('should return true if only last name  and first name is editing', async()=>{
+    it('should return true if only first name  and profile pic is editing', async()=>{
         db.update = jest.fn().mockReturnValue() ;
             
         const user1 = new User();
-        const result=await user1.editProfile({first_name:'dinesh',last_name:"chandimal"},1);
+        const result=await user1.editProfile({first_name:'dinesh',profile_pic:"123"},1);
         expect(result).toEqual(true);
     
     });
+
+});
+
+describe('deleteAccount', () => {
+ 
+    beforeEach(()=>{
+        sequelize.authenticate = jest.fn();
+    });
+ 
+    it('should return true after dlelte all data', async()=>{
+        db.update = jest.fn().mockReturnValue(1) ;
+        sdb.destroy = jest.fn().mockReturnValue(0) ;
+        rdb.destroy = jest.fn().mockReturnValue(0) ;
+        cdb.destroy = jest.fn().mockReturnValue(0) ;
+            
+        const user1 = new User();
+        const result=await user1.deleteAccount(1);
+        expect(result).toEqual(true);
+    
+    });
+
+    it('should return false when user is cannot find', async()=>{
+        db.update = jest.fn().mockReturnValue(0) ;
+        sdb.destroy = jest.fn().mockReturnValue(0) ;
+        rdb.destroy = jest.fn().mockReturnValue(0) ;
+        cdb.destroy = jest.fn().mockReturnValue(0) ;
+            
+        const user1 = new User();
+        const result=await user1.deleteAccount(1);
+        expect(result).toEqual(false);
+    
+    });
+
 });
 
 
