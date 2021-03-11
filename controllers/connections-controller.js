@@ -27,7 +27,7 @@ const addConnection = async (req, res, next) => {
     try {
         //user id taken from authentication not from url but passes in url
         let passedid = req.user;
-        //let passedid = req.body.user;
+        //let passedid = req.body.requesterid;
         const userID = req.params.userid;
         const response = await user.addConnection(userID, passedid);
 
@@ -70,6 +70,7 @@ const removeConnection = async (req, res, next) => {
     try {
         //user id taken from authentication not from url but passes in url
         let passedid = req.user;
+        //let passedid = req.params.userid;
         const userID = req.params.recipientid;
         const response = await user.removeConnection(userID, passedid);
 
