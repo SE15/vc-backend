@@ -1,84 +1,82 @@
-// const request = require('supertest');
+jest.mock('../../middlewares/authorization', () => jest.fn((req, res, next) => next()));
+jest.mock('../../middlewares/guest-access', () => jest.fn((req, res, next) => next()));
 
-// let server;
+const request = require('supertest');
 
-// describe('/users', () => {
+let server;
 
-//     beforeEach(() => { 
-//         server = require('../../index'); 
-//     });
-//     afterEach(async () => { 
-//         server.close();
-//     });
+describe('/users', () => {
+
+    beforeEach(() => { 
+        server = require('../../index'); 
+    });
+    afterEach(async () => { 
+        server.close();
+    });
     
-//     describe('GET /', () => {
+    describe('GET /', () => {
 
         
-//         let key;
+        let key;
 
-//         const exec = async () => {
-//             return await request(server).get('/users/?keyword='+key);
-//         }
+        const exec = async () => {
+            return await request(server).get('/users/?keyword='+key);
+        }
         
 
-//         // beforeEach(()=>{
-//         //     await request(server).post('/auth/').send({'email':'chandi@gmail.com','password':'password'});
-//         // })
-
-
-//         it('should return users relates to the search', async () => {
+        it('should return users relates to the search', async () => {
         
-//             key='Dinesh';
+            key='Dinesh';
                     
-//             const res = await exec();
+            const res = await exec();
 
-//             expect(res.status).toBe(200);
-//             expect(res.body).toHaveProperty("message", "Users found");  
+            expect(res.status).toBe(200);
+            expect(res.body).toHaveProperty("message", "Users found");  
 
-//         });
+        });
 
 
-//         it('should return 400 when given no users found for the search', async () => {
+        it('should return 400 when given no users found for the search', async () => {
         
-//             key="luvi";
+            key="luvi";
 
-//             const res = await exec();
+            const res = await exec();
 
-//             expect(res.status).toBe(400);
-//             expect(res.body).toHaveProperty("message", "No results found");  
+            expect(res.status).toBe(400);
+            expect(res.body).toHaveProperty("message", "No results found");  
 
-//         });
+        });
 
-//     });
+    });
 
-//     describe('POST /', () => {
+    describe('POST /', () => {
 
-//         let new_user_info;
+        let new_user_info;
 
-//         const exec=async()=>{
-//             //new user information
-//             new_user_info = {firstName:"ram",lastName:"smith", email:"ramii@mail.com", password:"password"};
-//             return await request(server).post('/users/').send( new_user_info);
-//         }
+        const exec=async()=>{
+            //new user information
+            new_user_info = {firstName:"jadd",lastName:"smith", email:"jadd@mail.com", password:"password"};
+            return await request(server).post('/users/').send( new_user_info);
+        }
 
-//         it('should return user registered if register success', async () => {            
+        it('should return user registered if register success', async () => {            
 
-//             const res = await exec();
+            const res = await exec();
     
-//             expect(res.status).toBe(200);
-//             expect(res.body).toHaveProperty("message","User successfully registered");
-//         });
+            expect(res.status).toBe(200);
+            expect(res.body).toHaveProperty("message","User successfully registered");
+        });
 
 
-//         it('should return user exists if already registered', async () => {   
+        it('should return user exists if already registered', async () => {   
             
-//             new_user_info = {firstName:"Dinesh",lastName:"Chandimal", email:"chandi@gmail.com", password:"password"};
-//             const res = await exec();
+            new_user_info = {firstName:"Dinesh",lastName:"Chandimal", email:"chandi@gmail.com", password:"password"};
+            const res = await exec();
     
-//             expect(res.status).toBe(400);
-//             expect(res.body).toHaveProperty("message", "User already exists");
-//         });
+            expect(res.status).toBe(400);
+            expect(res.body).toHaveProperty("message", "User already exists");
+        });
 
-//       });
+      });
   
-// });
+});

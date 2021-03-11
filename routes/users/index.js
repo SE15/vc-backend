@@ -21,8 +21,7 @@ router.use('/:userid/connections', require('./connections'));
 router.use('/:userid/recommendations', require('./recommendations'));
 router.use('/:userid/skills', require('./skills'));
 
-router.get('/', searchUser);
-//router.get('/', guestAccess, authorization, searchUser);
+router.get('/', guestAccess, authorization, searchUser);
 router.post('/', createAccount);
 
 router.get('/:userid', guestAccess, authorization, viewProfile);
