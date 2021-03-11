@@ -42,10 +42,11 @@ class Skill {
         if(user_id !== this.user_id) {
             if (cnt === 0) {
                 //update the database for the increment in validations
-                try {
+               
                     //updating the both skill and verificiation model in single transaction
                     await sequelize.transaction(async (t) => {
                         this.validations++;
+                        console.log(this.validations);
                         await ValidationModel.create({
                             skill_id: this.id,
                             validated_by: user_id
@@ -53,9 +54,7 @@ class Skill {
                         await this.saveToDatabase(false, t);
                     }); 
                     return true; 
-                } catch(err) {
-                    throw err;
-                }
+               
             } else {
                 return "validated";
             }
@@ -133,14 +132,14 @@ class Skill {
      * 
      * @returns Object - skill information
      */
-    getInformation() {
+    /*getInformation() {
         return {
             id: this.id,
             name: this.name,
             user_id: this.user_id,
             validations: this.validations
         };
-    }
+    }*/
 }
 
 module.exports = Skill;

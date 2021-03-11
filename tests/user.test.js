@@ -1,5 +1,6 @@
 
 const User= require("../services/user");
+const Skill=require("../services/user/skill");
 const db = require("../models/user-model");
 const rdb = require("../models/recommendation-model");
 const sdb = require("../models/skill-model");
@@ -610,6 +611,111 @@ describe('getAllUsers', ()=>{
         const result = await exec();                                       
         expect(result).toContainEqual(obj);
     });
+});
+
+describe('removeSkill', ()=> {
+
+    let id;
+    
+    const exec = async()=> {
+        sdb.findOne = jest.fn().mockReturnValue({id:1,user_id:11,name:"sql",validations:1})
+        const user1 = new User();
+        return await user1.removeSkill(id);
+    };
+
+    beforeEach(()=>{
+        sequelize.authenticate = jest.fn(); 
+        id=1; 
+    });
+
+    it('should return true if skill is removed successfully', async()=> {
+        sdb.destroy = jest.fn().mockReturnValue(true);
+        const result = await exec();            
+        expect(result).toBeTruthy();
+    });
+
+    it('should return false if skill remove is not successfully', async()=> {
+        sdb.destroy = jest.fn().mockReturnValue(false);
+        const result = await exec();            
+        expect(result).toBeFalsy();
+    });
+
+});
+
+describe('addSkill', ()=> {
+
+    let user_id;
+    
+    const exec = async()=> {
+        
+        sdb.findOne = jest.fn().mockReturnValue({id:60,validations:0});
+        sdb.update = jest.fn();
+        //const skill=new Skill({user_id:this.user_id});
+        //skill.saveToDatabase(true)= jest.fn().mockReturnValue(true);
+        const user1 = new User();
+        return await user1.addSkill(user_id);
+    };
+
+    beforeEach(()=>{
+        sequelize.authenticate = jest.fn(); 
+        user_id=1; 
+    });
+
+    it('should return false if skill added not successfully when throw an exception', async()=> {
+        sdb.create = jest.fn(new Error());
+        const result = await exec();            
+        expect(result).toBeFalsy();
+    });
+    
+    it('should return true if skill is added successfully when adding a new skill', async()=> {
+        sdb.create = jest.fn();
+        const result = await exec();            
+        expect(result).toBeTruthy();
+    });
+
+});
+
+describe('validateSkill', ()=> {
+    
+    const exec = async()=> {
+        const user1 = new User();
+        return await user1.validateSkill(skill_id,passed_id);
+    };
+
+    beforeEach(()=>{
+        sequelize.authenticate = jest.fn(); 
+        skill_id=1;
+        passed_id=2;
+    });
+
+    it('should return a message when user trying to validate his own skill', async()=> {
+        vdb.count = jest.fn().mockReturnValue(0);
+        sdb.findOne = jest.fn().mockReturnValue({id:1,name:"sql",user_id:1,validations:0})
+        passed_id=1;
+        const result = await exec();            
+        expect(result).toEqual("You cannot validate your own skill");
+    });
+
+    it('should return a message when user trying to validate already exist skill', async()=> {
+        sdb.findOne = jest.fn().mockReturnValue({id:1,name:"sql",user_id:1,validations:0})
+        vdb.count = jest.fn().mockReturnValue(1);
+        const result = await exec();            
+        expect(result).toEqual("validated");
+    });
+
+    it('should return true when user trying to validate already exist skill', async()=> {
+        sdb.findOne = jest.fn().mockReturnValue({id:1,name:"sql",user_id:1,validations:0})
+        vdb.count = jest.fn().mockReturnValue(0);
+        sequelize.transaction = jest.fn();
+         /*   this.validations++;
+            vdb.create = jest.fn({transaction:t});
+        });
+        sdb.update = jest.fn();*/
+
+        const result = await exec();            
+        expect(result).toBeTruthy();
+    });
+
 });
 
 
