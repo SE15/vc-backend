@@ -28,14 +28,7 @@ const UserModel=sequelize.define('User',{
     modelName:'User',
     tableName:'User',
     timestamps: false,
-    instanceMethods: {
-        generateHash(password) {
-            return bcrypt.hash(password, bcrypt.genSaltSync(8));
-        },
-        validPassword(password) {
-            return bcrypt.compare(password, this.password);
-        }
-    }
+    
 });
 
 module.exports = UserModel;
