@@ -35,6 +35,9 @@ describe('incrementValidations', () => {
         vdb.count = jest.fn().mockReturnValue(count);
         vdb.create = jest.fn(); 
         sdb.update = jest.fn();
+        sequelize.transaction = jest.fn().mockImplementation((func) =>{
+            func();
+        });
         const skill=new Skill(skillInfo);
         return await skill.incrementValidations(user_id);
     };
@@ -140,7 +143,7 @@ describe('saveToDatabase', () => {
 
     it('should return true when updating an existing skill is successfull(transaction not null)', async()=>{
         isNew=false;
-        t=t;
+        t=1;
         sdb.update = jest.fn();
         const result = await exec();
         expect(result).toBeTruthy();
