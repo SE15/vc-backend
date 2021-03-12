@@ -64,7 +64,7 @@ class Connection {
              connectionInfo = connectionInfo2;
         }else{
             connectionInfo = connectionInfo1;
-        }     
+        }          
         return new Connection(connectionInfo);
     }
 
@@ -138,6 +138,5 @@ class Connection {
         }
     }
         
-          
-
+ 
 module.exports = Connection;
