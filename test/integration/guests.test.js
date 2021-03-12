@@ -7,10 +7,10 @@ let server;
 
 describe('/users', () => {
 
-    beforeEach(() => { 
+    beforeAll(() => { 
         server = require('../../index'); 
     });
-    afterEach(async () => { 
+    afterAll(async () => { 
         server.close();
     });
     
@@ -55,7 +55,7 @@ describe('/users', () => {
 
         const exec=async()=>{
             //new user information
-            new_user_info = {firstName:"jadd",lastName:"smith", email:"jadd@mail.com", password:"password"};
+            new_user_info = {firstName:"test_f",lastName:"test_l", email:"test_e@mail.com", password:"password"};
             return await request(server).post('/users/').send( new_user_info);
         }
 
