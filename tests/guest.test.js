@@ -64,14 +64,14 @@ describe('searchUser', () => {
         arr=[{ first_name: 'Lahiru', last_name: 'Madhushan', profile_pic: null  }];
     });
 
-    it('should return an array containing one element if there is only one user maching to the text ', async()=>{
+    it('should return an array containing one element if there is only one user matching to the text ', async()=>{
         
         const result = await exec();
         expect(result).toContainEqual({ first_name: 'Lahiru', last_name: 'Madhushan', profile_pic: null});
     
     });
 
-    it('should return an array containing more than one element if there are more than one user maching to the text ', async()=>{
+    it('should return an array containing more than one element if there are more than one user matching to the text ', async()=>{
         name="Oshan"
         arr=[{ first_name: 'Oshani', last_name: 'Weerasinghe', profile_pic: null },
              { first_name: 'Oshan', last_name: 'Jayawardhana', profile_pic: null } ]

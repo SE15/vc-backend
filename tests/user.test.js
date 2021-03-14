@@ -140,11 +140,11 @@ describe('addConnection' , ()=> {
 
     });
 
-    it('should throw an error if the request ', async()=>{
+    /*it('should throw an error if the request ', async()=>{
         const result = await exec();            
         expect(result).toBeTruthy();
 
-    });
+    });*/
 
     
 });
@@ -696,14 +696,14 @@ describe('validateSkill', ()=> {
         expect(result).toEqual("You cannot validate your own skill");
     });
 
-    it('should return a message when user trying to validate already exist skill', async()=> {
+    it('should return a message when user trying to validate already validated skill', async()=> {
         sdb.findOne = jest.fn().mockReturnValue({id:1,name:"sql",user_id:1,validations:0})
         vdb.count = jest.fn().mockReturnValue(1);
         const result = await exec();            
         expect(result).toEqual("validated");
     });
 
-    it('should return true when user trying to validate already exist skill', async()=> {
+    it('should return true when user trying to validate a skill', async()=> {
         sdb.findOne = jest.fn().mockReturnValue({id:1,name:"sql",user_id:1,validations:0})
         vdb.count = jest.fn().mockReturnValue(0);
         sequelize.transaction = jest.fn();
