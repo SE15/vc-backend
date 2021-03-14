@@ -65,14 +65,19 @@ const deleteAccount = async (req, res, next) => {
   try {
     //user id taken from authentication not from url but passes in url
     let passedid = req.user;
+    
+    if(passedid!=req.params.userid){
+      return errorMessage(res,"Not authorized",401);
+      
+    }else{
+      const response = await user.deleteAccount(passedid);
 
-    const response = await user.deleteAccount(passedid);
-
-    if (response === true) {
-      return successMessage(res, true, "User successfully deleted");
-    } else {
-      return errorMessage(res, "Unable to delete the account", 500);
-    }
+      if (response === true) {
+        return successMessage(res, true, "User successfully deleted");
+      } else {
+        return errorMessage(res, "Unable to delete the account", 500);
+      }
+    }  
   } catch (err) {
     next(err);
   }
